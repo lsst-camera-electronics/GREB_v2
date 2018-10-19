@@ -1,6 +1,6 @@
 
 # Define target output
-target: bit prom
+target: bit prom multiboot
 
 # Define target part
 export PRJ_PART = XC7K160TFFG676-1
@@ -24,7 +24,8 @@ export MODULE_DIRS = $(PROJ_DIR)/../../modules/LSST_common/ADC_data_handler_v4 \
 		     $(PROJ_DIR)/../../modules/LSST_common/clk_2MHz_gen \
                      $(PROJ_DIR)/../../modules/LSST_common/seq_aligner_shifter \
                      $(PROJ_DIR)/../../modules/LSST_common/sequencer_v3 \
-		     $(PROJ_DIR)/../../modules/LSST_common/lsst_sci-master \
+		     $(PROJ_DIR)/../../modules/LSST_common/lsst_sci-master-v32 \
+		     $(PROJ_DIR)/../../modules/LSST_common/sync_cmd_decoder \
 		     $(PROJ_DIR)/../../modules/StdLib  \
 		     $(PROJ_DIR)/../../modules/MgtLib/gtx7  \
                      $(PROJ_DIR)/../../modules/pgp2b/core \
@@ -71,3 +72,19 @@ export MODULE_DIRS = $(PROJ_DIR)/../../modules/LSST_common/ADC_data_handler_v4 \
 include ../../modules/StdLib/build/system_vivado_v1.mk
 
 
+
+# Use top level makefile
+include ../../modules/StdLib/build/system_vivado_v1.mk
+
+###############################################################
+#### multiboot #####################################################
+###############################################################
+$(IMAGES_DIR)/$(PROJECT)_$(PRJ_VERSION)_multiboot.mcs: $(IMAGES_DIR)/$(PROJECT)_$(PRJ_VERSION).mcs
+	$(call ACTION_HEADER,"PROM Multiboot Generate")
+	@cd $(OUT_DIR); vivado -mode batch -source $(VIVADO_DIR)/mcs_jump_maker.tcl
+	@echo ""
+	@echo "Multiboot Prom file copied to $@"
+	@echo "Don't forget to 'svn commit' when the image is stable!"
+
+.PHONY      : multiboot
+multiboot   : bit $(IMAGES_DIR)/$(PROJECT)_$(PRJ_VERSION)_multiboot.mcs

@@ -35,7 +35,16 @@ package LsstSciPackage is
    -- Version 2A Refactored internal interfaces
    -- Version 2B Fixed bug in Data Encoder introduced in 2A
    -- Version 2C Fixed bug in Data Encoder which required RCE reboots after resets
-  constant LSST_SCI_VERSION : std_logic_vector(11 downto 0) := x"02C";
+   -- Version 2D Reset on Link Down and change notice to 16 bits
+   -- Version 2E Use recovered clock for synch command decoding
+   -- Version 2F Tag-up version to show Ben
+   -- Version 30 12-channel fixed latency version
+   -- Version 31 Fix to LsstPgpFrontEnd (which will eventually move into pgp2b_core)
+   -- Version 32 Added POR to MGTs to reduce garbage on power up
+   -- Version 33 Fixed LsstSciStatus to work with different Tx and Rx clocks
+   --            SCI now generates notices on Link Up and FE reset
+   --            FE is no longer reset when PGP link is lost
+   constant LSST_SCI_VERSION : std_logic_vector(11 downto 0) := x"033";
 
    -- Image Data Format Version
    constant LSST_DATA_UNSPECIFIED     : std_logic_vector(3 downto 0) := x"0";

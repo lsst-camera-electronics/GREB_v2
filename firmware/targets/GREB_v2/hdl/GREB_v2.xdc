@@ -1,22 +1,47 @@
 #### Timing constraints ####
 
+#### OLD ####
 # clock from the quartz
-create_clock -period 4.000 -name PgpRefClk_P -waveform {0.000 2.000} [get_ports PgpRefClk_P]
+#create_clock -period 4.000 -name PgpRefClk_P -waveform {0.000 2.000} [get_ports PgpRefClk_P]
 
 #Generated clocks (report clock network to see unconstrained clk)
 
-create_generated_clock -name REB_onewire_1Mhz -source [get_pins dcm_user_clk_0/CLK_OUT1] -divide_by 104 [get_pins REB_1wire_sn/clkdivider/clk_gen_reg/Q]
-create_generated_clock -name REB_onewire_50khz -source  [get_pins REB_1wire_sn/clkdivider/clk_gen_reg/Q] -divide_by 20 [get_pins REB_1wire_sn/ow_master_i/jcnt2/pro2.qi_reg[9]/Q]
+#create_generated_clock -name REB_onewire_1Mhz -source [get_pins dcm_user_clk_0/CLK_OUT1] -divide_by 104 [get_pins REB_1wire_sn/clkdivider/clk_gen_reg/Q]
+#create_generated_clock -name REB_onewire_50khz -source  [get_pins REB_1wire_sn/clkdivider/clk_gen_reg/Q] -divide_by 20 [get_pins REB_1wire_sn/ow_master_i/jcnt2/pro2.qi_reg[9]/Q]
 
 #set asynchronous clocks
 #clocks CLK_OUT1_dcm_user_clk CLK_OUT2_dcm_user_clk REB_onewire_1Mhz REB_onewire_50khz are synchronous between them but asynchronous to the rest
-set_clock_groups -asynchronous -group {CLK_OUT1_dcm_user_clk CLK_OUT2_dcm_user_clk}
-set_clock_groups -asynchronous -group {REB_onewire_1Mhz REB_onewire_50khz}
+#set_clock_groups -asynchronous -group {CLK_OUT1_dcm_user_clk CLK_OUT2_dcm_user_clk}
+#set_clock_groups -asynchronous -group {REB_onewire_1Mhz REB_onewire_50khz}
 
 
 #clock mmcm_adv_inst_n_6 and I are asynchronous to each other
-set_clock_groups -asynchronous -group {pgpClk_PgpClkCore} -group {I}
+#set_clock_groups -asynchronous -group {pgpClk_PgpClkCore} -group {I}
 
+
+
+
+# clock from the quartz (250 MHz)
+create_clock -period 4.000 -name PgpRefClk_P -waveform {0.000 2.000} [get_ports PgpRefClk_P]
+
+# GTX RX reconstructed clock (156.25 MHz)
+create_clock -period 6.400 -name RXOUTCLK_0 -waveform {0.000 3.200} [get_pins LsstSci_0/LsstPgpFrontEnd_Inst/Pgp2bGtx7Fixedlat_Inst/Gtx7Core_1/gtxe2_i/RXOUTCLK]
+
+# GTX TX reconstructed clock (156.25 MHz)
+create_clock -period 6.400 -name TXOUTCLK_0 -waveform {0.000 3.200} [get_pins LsstSci_0/LsstPgpFrontEnd_Inst/Pgp2bGtx7Fixedlat_Inst/Gtx7Core_1/gtxe2_i/TXOUTCLK]
+
+# local clock for front end (100 MHz from RX reconstructed clock)
+create_generated_clock -name clk_100_Mhz -master_clock RXOUTCLK_0 [get_pins dcm_user_clk_0/inst/mmcm_adv_inst/CLKOUT0]
+
+# local clock for front end (50 MHz from RX reconstructed clock)
+create_generated_clock -name clk_50_Mhz -master_clock RXOUTCLK_0 [get_pins dcm_user_clk_0/inst/mmcm_adv_inst/CLKOUT1]
+
+create_generated_clock -name REB_onewire_1Mhz -source [get_pins dcm_user_clk_0/CLK_OUT1] -divide_by 104 [get_pins REB_1wire_sn/clkdivider/clk_gen_reg/Q]
+create_generated_clock -name REB_onewire_50khz -source [get_pins REB_1wire_sn/clkdivider/clk_gen_reg/Q] -divide_by 20 [get_pins {REB_1wire_sn/ow_master_i/jcnt2/pro2.qi_reg[9]/Q}]
+
+#set asynchronous clocks
+
+set_clock_groups -asynchronous -group [get_clocks PgpRefClk_P -include_generated_clocks] -group RXOUTCLK_0 -group TXOUTCLK_0 -group {clk_100_Mhz clk_50_Mhz} -group {REB_onewire_1Mhz REB_onewire_50khz}
 
 
 ### Pin Assignment ###
@@ -258,6 +283,13 @@ set_property PACKAGE_PIN AA23 [get_ports ck_adc_SHDN]
 set_property PACKAGE_PIN T19  [get_ports ccd1_adc_SHDN]
 set_property PACKAGE_PIN L17  [get_ports ccd2_adc_SHDN]
 
+#### Remote Update
+#Bank 14
+set_property PACKAGE_PIN C23 [get_ports ru_outSpiCsB]
+set_property PACKAGE_PIN B24 [get_ports ru_outSpiMosi]
+set_property PACKAGE_PIN A25 [get_ports ru_inSpiMiso]
+set_property PACKAGE_PIN B22 [get_ports ru_outSpiWpB]
+set_property PACKAGE_PIN A22 [get_ports ru_outSpiHoldB]
 
 ### misc signals ###
 
@@ -321,6 +353,9 @@ set_property IOSTANDARD LVDS [get_ports gpio_1_n]
 set_property PACKAGE_PIN AE25 [get_ports gpio_1_dir]
 set_property IOSTANDARD LVCMOS33 [get_ports gpio_1_dir]
 
+set_property PACKAGE_PIN C24 [get_ports gpio_2]
+set_property IOSTANDARD LVCMOS33 [get_ports gpio_2]
+
 #### set voltages ####
 
 set_property IOSTANDARD LVDS [get_ports ASPIC_r*]
@@ -353,12 +388,30 @@ set_property IOSTANDARD LVCMOS33 [get_ports Pwron_Rst_L]
 set_property IOSTANDARD LVCMOS33 [get_ports ASPIC_ref*]
 set_property IOSTANDARD LVCMOS33 [get_ports ASPIC_5*]
 set_property IOSTANDARD LVCMOS33 [get_ports reb_sn_onewire]
+set_property IOSTANDARD LVCMOS33 [get_ports ru_*]
 
 
 #### set flash SPI speed ####
 #more command options are in UG908 programming and debugging appendix A 
 
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design] 
+
+# set SPI bus width during boot 
+set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
+
+## set Flash SPI address width
+set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR YES [current_design]
+
+## set multiboot config
+#enalble fallback
+set_property BITSTREAM.CONFIG.CONFIGFALLBACK ENABLE [current_design]
+
+## watchdog for triggeringring the fallback reboot in  case of error 
+set_property BITSTREAM.CONFIG.TIMER_CFG 0x4007A120 [current_design]
+
+# set jump address at boot time. The FPGA duirng boot will jup to this address
+#and load the image that starts form there 
+#set_property BITSTREAM.CONFIG.NEXT_CONFIG_ADDR 32'h00800000 [current_design]
 
 #### set hardware configuration ####
 ## setting to avoid warning CFGBVS in vivado DRC

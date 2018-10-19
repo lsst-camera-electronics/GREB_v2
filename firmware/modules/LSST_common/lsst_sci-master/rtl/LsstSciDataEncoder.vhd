@@ -105,23 +105,23 @@ begin
   -- data to the 16 bit PGP data.
   ----------------------------------------------------------------------------
   U_gen_zero_extend_32 : if RAFT_DATA_CONVERSION = "ZERO_EXTEND_32" generate
---    imageDataFormat <= LSST_DATA_32B_ZERO_EXTEND;
+    imageDataFormat <= LSST_DATA_32B_ZERO_EXTEND;
 
---    data_encoder : entity work.LsstSci32bZExt
---      port map (
---        DataClk    => sysClk,
---        DataWrEn   => dataWrEn,
---        DataSOT    => dataSOT,
---        DataEOT    => dataEOT,
---        DataIn     => dataIn(17 downto 0),
---        FrameReset => pgpRst,
---        FrameRdClk => pgpClk,
---        FrameRdEn  => fifoRdEn,
---        FrameValid => fifoValid,
---        FrameEmpty => fifoEmpty,
---        FrameSOT   => fifoDataOutSOT,
---        FrameEOT   => fifoDataOutEOT,
---        FrameData  => fifoDataOut(15 downto 0));
+    data_encoder : entity work.LsstSci32bZExt
+      port map (
+        DataClk    => sysClk,
+        DataWrEn   => dataWrEn,
+        DataSOT    => dataSOT,
+        DataEOT    => dataEOT,
+        DataIn     => dataIn(17 downto 0),
+        FrameReset => pgpRst,
+        FrameRdClk => pgpClk,
+        FrameRdEn  => fifoRdEn,
+        FrameValid => fifoValid,
+        FrameEmpty => fifoEmpty,
+        FrameSOT   => fifoDataOutSOT,
+        FrameEOT   => fifoDataOutEOT,
+        FrameData  => fifoDataOut(15 downto 0));
   end generate;
 
   U_gen_trunc_low_2 : if RAFT_DATA_CONVERSION = "TRUNC_LOW_2" generate
