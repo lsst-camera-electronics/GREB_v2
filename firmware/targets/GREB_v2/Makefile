@@ -20,12 +20,13 @@ export MODULE_DIRS = $(PROJ_DIR)/../../modules/LSST_common/ADC_data_handler_v4 \
                      $(PROJ_DIR)/../../modules/LSST_common/ltc2945_V_I_sensors_greb \
 		     $(PROJ_DIR)/../../modules/LSST_common/max_11046_adc \
                      $(PROJ_DIR)/../../modules/LSST_common/multiboot \
-                     $(PROJ_DIR)/../../modules/LSST_common/onewire_iface \
+                     $(PROJ_DIR)/../../modules/LSST_common/onewire_iface_v2 \
 		     $(PROJ_DIR)/../../modules/LSST_common/clk_2MHz_gen \
                      $(PROJ_DIR)/../../modules/LSST_common/seq_aligner_shifter \
-                     $(PROJ_DIR)/../../modules/LSST_common/sequencer_v3 \
-		     $(PROJ_DIR)/../../modules/LSST_common/lsst_sci-master-v32 \
+                     $(PROJ_DIR)/../../modules/LSST_common/sequencer_v4 \
+		     $(PROJ_DIR)/../../modules/LSST_common/lsst_sci-master-v37 \
 		     $(PROJ_DIR)/../../modules/LSST_common/sync_cmd_decoder \
+		     $(PROJ_DIR)/../../modules/LSST_common/REB_interrupt \
 		     $(PROJ_DIR)/../../modules/StdLib  \
 		     $(PROJ_DIR)/../../modules/MgtLib/gtx7  \
                      $(PROJ_DIR)/../../modules/pgp2b/core \
