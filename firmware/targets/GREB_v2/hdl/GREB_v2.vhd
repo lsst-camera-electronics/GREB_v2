@@ -634,16 +634,18 @@ architecture Behavioral of GREB_v2 is
 
   component REB_interrupt_top
     generic (
-      edge_en : std_logic_vector(13 downto 0));
+      interrupt_bus_width : integer := 32);
+
     port (
       clk               : in  std_logic;
       reset             : in  std_logic;
-      interrupt_bus_in  : in  std_logic_vector(13 downto 0);
+      edge_en           : in  std_logic_vector(interrupt_bus_width-1 downto 0);
+      interrupt_bus_in  : in  std_logic_vector(interrupt_bus_width-1 downto 0);
       mask_bus_in_en    : in  std_logic;
-      mask_bus_in       : in  std_logic_vector(13 downto 0);
-      mask_bus_out      : out std_logic_vector(13 downto 0);
+      mask_bus_in       : in  std_logic_vector(interrupt_bus_width-1 downto 0);
+      mask_bus_out      : out std_logic_vector(interrupt_bus_width-1 downto 0);
       interrupt_en_out  : out std_logic;
-      interrupt_bus_out : out std_logic_vector(13 downto 0));
+      interrupt_bus_out : out std_logic_vector(interrupt_bus_width-1 downto 0));
   end component;
 
   component base_reg_set_top is
@@ -1130,11 +1132,12 @@ architecture Behavioral of GREB_v2 is
   signal sync_cmd_delay_read : std_logic_vector(7 downto 0);
 
   -- iterrupt signals
-  signal interrupt_bus_in  : std_logic_vector(13 downto 0);
+  signal interrupt_bus_in  : std_logic_vector(31 downto 0);
   signal mask_bus_in_en    : std_logic;
-  signal mask_bus_out      : std_logic_vector(13 downto 0);
+  signal mask_bus_out      : std_logic_vector(31 downto 0);
   signal interrupt_en_out  : std_logic;
-  signal interrupt_bus_out : std_logic_vector(13 downto 0);
+  signal interrupt_bus_out : std_logic_vector(31 downto 0);
+  signal interrupt_edge_en : std_logic_vector(31 downto 0);
   signal fe_reset_notice   : std_logic;
 
   -- BRS signals
@@ -1487,7 +1490,10 @@ begin
   temp_busy <= DREB_temp_busy or REB_temp_busy_gr1 or REB_temp_busy_gr2;
 
   -- DAQ v36 and beyond
-  interrupt_bus_in <= "00" & x"0" & temp_busy & V_I_busy & fe_reset_notice & sequencer_0_outputs(31) & SCI_DataIn(0).eot & SCI_DataIn(0).sot & sequencer_0_busy & sequencer_0_busy;
+  interrupt_edge_en <= "00" & x"000" & "001" & "11101" & "11101" & "11101";
+  interrupt_bus_in  <= "00" & x"000" & temp_busy & V_I_busy & fe_reset_notice &
+                       x"00" & "00" &
+                       sequencer_0_outputs(31) & SCI_DataIn(0).eot & SCI_DataIn(0).sot & sequencer_0_busy & sequencer_0_busy;
 
 
   ASPIC_spi_mosi_ccd_1  <= ASPIC_mosi_int;
@@ -2071,16 +2077,17 @@ begin
   
   REB_interrupt_top_1 : REB_interrupt_top
     generic map (
-      edge_en => "00" & x"0" & "00111101")
+      interrupt_bus_width => 32)
     port map (
       clk               => clk_100_Mhz,
       reset             => usrRst,
+      edge_en           => interrupt_edge_en,
       interrupt_bus_in  => interrupt_bus_in,
       mask_bus_in_en    => mask_bus_in_en,
-      mask_bus_in       => regDataWr_masked(13 downto 0),
+      mask_bus_in       => regDataWr_masked(31 downto 0),
       mask_bus_out      => mask_bus_out,
       interrupt_en_out  => interrupt_en_out,
-      interrupt_bus_out => interrupt_bus_out);
+      interrupt_bus_out => interrupt_bus_out); 
 
 -- CCD 1
   sequencer_v4_ccd1 : sequencer_v4_top
