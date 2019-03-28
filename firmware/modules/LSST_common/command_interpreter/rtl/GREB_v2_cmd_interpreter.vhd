@@ -608,10 +608,10 @@ begin
         slow_adc_start_write <= '0';
 
         -- DREB 1wire sn
-        dreb_onewire_reset <= '1';
+        dreb_onewire_reset <= '0';
 
         -- REB 1wire sn
-        reb_onewire_reset <= '1';
+        reb_onewire_reset <= '0';
 
         -- CCD clock enable
         ccd_clk_en <= '0';
@@ -867,10 +867,10 @@ begin
 
 
                                         -- DREB 1wire sn
-    next_dreb_onewire_reset <= '1';
+    next_dreb_onewire_reset <= '0';
 
                                         -- REB 1wire sn
-    next_reb_onewire_reset <= '1';
+    next_reb_onewire_reset <= '0';
 
                                         -- CCD clock enable
     next_ccd_clk_en <= '0';
@@ -1597,13 +1597,13 @@ begin
               -- DREB 1wire serial number start acq                                                                                                          
             elsif regAddr = dreb_sn_acq_cmd then
               next_state              <= dreb_sn_acq_state;
-              next_dreb_onewire_reset <= '0';
+              next_dreb_onewire_reset <= '1';
 
 ---------- REB 1wire serial number                                                      
               -- REB 1wire serial number start acq                                                                                                           
             elsif regAddr = reb_sn_acq_cmd then
               next_state             <= reb_sn_acq_state;
-              next_reb_onewire_reset <= '0';
+              next_reb_onewire_reset <= '1';
 
 ---------- CCD clock enable                                                   
             elsif regAddr = ccd_clk_en_cmd then
@@ -2474,12 +2474,12 @@ begin
 ---------------------- DREB 1wire serial number --------------------------                              
 -- DREB 1wire serial number acq
       when dreb_sn_acq_state =>
-        if dreb_sn_crc_ok = '0' and dreb_sn_dev_error = '0' and dreb_sn_timeout = '0' then
-          next_state              <= dreb_sn_acq_state;
-          next_dreb_onewire_reset <= '0';
-        else
-          next_state <= ack_del_1;
-        end if;
+        --if dreb_sn_crc_ok = '0' and dreb_sn_dev_error = '0' and dreb_sn_timeout = '0' then
+        --  next_state              <= dreb_sn_acq_state;
+        next_dreb_onewire_reset <= '0';
+        --    else
+        next_state              <= ack_del_1;
+        --    end if;
 
 -- DREB 1wire serial number read w 0            
       when dreb_sn_read_w0_state =>
@@ -2496,12 +2496,12 @@ begin
 ---------------------- REB 1wire serial number --------------------------                               
 -- REB 1wire serial number acq
       when reb_sn_acq_state =>
-        if reb_sn_crc_ok = '0' and reb_sn_dev_error = '0' and reb_sn_timeout = '0' then
-          next_state             <= reb_sn_acq_state;
-          next_reb_onewire_reset <= '0';
-        else
-          next_state <= ack_del_1;
-        end if;
+        --if reb_sn_crc_ok = '0' and reb_sn_dev_error = '0' and reb_sn_timeout = '0' then
+        --  next_state             <= reb_sn_acq_state;
+        next_reb_onewire_reset <= '0';
+        --   else
+        next_state             <= ack_del_1;
+        --   end if;
 
 -- REB 1wire serial number read w 0             
       when reb_sn_read_w0_state =>
