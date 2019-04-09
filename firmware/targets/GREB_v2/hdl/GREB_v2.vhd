@@ -2761,7 +2761,7 @@ begin
       CLK_OUT1 => clk_100_Mhz,
       CLK_OUT2 => clk_25_Mhz,
       -- Status and control signals
-      LOCKED   => open);
+      LOCKED   => dcm_locked);
 
 
   --check master clk
