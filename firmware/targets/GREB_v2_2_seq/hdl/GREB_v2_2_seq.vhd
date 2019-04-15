@@ -348,7 +348,7 @@ architecture Behavioral of GREB_v2_2_seq is
   end component;
 
 
-  component GREB_v2_cmd_interpeter
+  component GREB_v2_cmd_interpeter_2_seq
     port (
       reset : in std_logic;
       clk   : in std_logic;
@@ -1760,7 +1760,7 @@ begin
       PgpTxPhyReadyOut   => open
       );
 
-  GREB_v2_cmd_interpeter_0 : GREB_v2_cmd_interpeter
+  GREB_v2_cmd_interpeter_0 : GREB_v2_cmd_interpeter_2_seq
     port map (
       reset                        => sync_res,
       clk                          => clk_100_MHz,

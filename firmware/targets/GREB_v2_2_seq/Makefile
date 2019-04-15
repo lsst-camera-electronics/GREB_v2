@@ -13,7 +13,7 @@ export MODULE_DIRS = $(PROJ_DIR)/../../modules/LSST_common/ADC_data_handler_v4 \
                      $(PROJ_DIR)/../../modules/LSST_common/ad7794_temp_sens \
                      $(PROJ_DIR)/../../modules/LSST_common/adt7420_multiread \
                      $(PROJ_DIR)/../../modules/LSST_common/aspic_3_program \
-                     $(PROJ_DIR)/../../modules/LSST_common/command_interpreter \
+                     $(PROJ_DIR)/../../modules/LSST_common/command_interpreter_2_seq \
                      $(PROJ_DIR)/../../modules/LSST_common/dcm_user_clk \
                      $(PROJ_DIR)/../../modules/LSST_common/dual_ad53xx \
 		     $(PROJ_DIR)/../../modules/LSST_common/dual_ads1118 \
