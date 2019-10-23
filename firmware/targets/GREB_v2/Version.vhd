@@ -23,9 +23,9 @@ package Version is
 -------------------------------------------------------------------------------
   -- 202c2000 GREB v2 first version
 
-  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"21372006"; -- MAKE_VERSION
+  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"21382006"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "GREB_v2: Vivado v2015.3 (x86_64) Built Tue Apr  9 11:56:26 CEST 2019 by srusso";
+constant BUILD_STAMP_C : string := "GREB_v2: Vivado v2015.3 (x86_64) Built Wed Oct 23 11:57:22 PDT 2019 by srusso";
 
 end Version;
 
