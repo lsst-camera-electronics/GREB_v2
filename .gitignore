@@ -45,3 +45,5 @@ _xmsgs
 *~
 
 old/
+./firmware/modules/LSST_common/lsst_sim/firmware_old
+./firmware/build
