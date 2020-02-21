@@ -390,6 +390,10 @@ architecture Behavioral of GREB_v2_2_seq is
       sync_cmd_delay_en   : out std_logic;  -- set the sync command0 delay
       sync_cmd_delay_read : in  std_logic_vector(7 downto 0);
 
+      -- interrupt commands
+          interrupt_mask_wr_en     : out std_logic;
+          interrupt_mask_read      : in  std_logic_vector(31 downto 0);
+
 -- Image parameters
       image_size        : in  std_logic_vector(31 downto 0);  -- this register contains the image size
       image_patter_read : in  std_logic;  -- this register gives the state of image patter gen. 1 is ON
@@ -1797,6 +1801,10 @@ begin
       -- sync commands 
       sync_cmd_delay_en            => sync_cmd_delay_en,
       sync_cmd_delay_read          => sync_cmd_delay_read,
+
+      -- interrupt commands
+      interrupt_mask_wr_en     => mask_bus_in_en,
+      interrupt_mask_read      => mask_bus_out,
 -- Image parameters
       image_size                   => x"00000000",  -- this register contains the image size (no longer used)
       image_patter_read            => image_patter_read,  -- this register gives the state of image patter gen. 1 is ON
@@ -2064,6 +2072,8 @@ begin
       interrupt_en_out  => interrupt_en_out,
       interrupt_bus_out => interrupt_bus_out);
 
+      start_add_prog_mem_in <= "000" & sync_cmd_main_add & "00";
+  
 -- CCD 1
   sequencer_v4_ccd1 : sequencer_v4_top
     --sequencer_v3_ccd_1 : sequencer_v3_top

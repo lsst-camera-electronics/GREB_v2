@@ -40,6 +40,8 @@ package GREB_v2_commands_package is
   constant sync_cmd_delay_cmd : std_logic_vector(23 downto 0) := x"000015";
   constant sync_cmd_mask_cmd  : std_logic_vector(23 downto 0) := x"000016";
 
+  constant interrupt_mask_cmd : std_logic_vector(23 downto 0) := x"000017";
+
    -- Bitstream Remote Update
   constant ru_start_cmd              : std_logic_vector(23 downto 0) := x"000100";
   constant ru_bitstream_we_cmd       : std_logic_vector(23 downto 0) := x"000101";

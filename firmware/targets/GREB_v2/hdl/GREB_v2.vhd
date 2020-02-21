@@ -386,9 +386,13 @@ architecture Behavioral of GREB_v2 is
       Mgt_avtt_ok         : in  std_logic;
       V3_3v_ok            : in  std_logic;
       Switch_addr         : in  std_logic_vector(7 downto 0);
-      -- sync commands
+-- sync commands
       sync_cmd_delay_en   : out std_logic;  -- set the sync command0 delay
       sync_cmd_delay_read : in  std_logic_vector(7 downto 0);
+
+-- interrupt commands
+      interrupt_mask_wr_en : out std_logic;
+      interrupt_mask_read  : in  std_logic_vector(31 downto 0);
 
 -- Image parameters
       image_size        : in  std_logic_vector(31 downto 0);  -- this register contains the image size
@@ -1788,41 +1792,46 @@ begin
 
   GREB_v2_cmd_interpeter_0 : GREB_v2_cmd_interpeter
     port map (
-      reset                        => sync_res,
-      clk                          => clk_100_MHz,
+      reset                  => sync_res,
+      clk                    => clk_100_MHz,
 -- signals from/to SCI
-      regReq                       => regReq,  -- with this line the master start a read/write procedure (1 to start)
-      regOp                        => regOp,  -- this line define if the procedure is read or write (1 to write)
-      regAddr                      => RegAddr,  -- address bus
-      statusReg                    => StatusReg,  -- status reg bus. The RCI handle this bus and this machine pass it to the sure if he wants to read it
-      regWrEn                      => RegWrEn,  -- write enable bus. This bus enables the data write bits
-      regDataWr_masked             => regDataWr_masked,  -- data write bus masked. Is the logical AND of data write bus and write enable bus
-      regAck                       => regAck,  -- acknowledge line to activate when the read/write procedure is completed
-      regFail                      => regFail,  -- line to activate when an error occurs during the read/write procedure
-      regDataRd                    => RegDataRd,  -- data bus to RCI used to transfer read data
-      StatusReset                  => StatusRst,  -- status block reset
+      regReq                 => regReq,  -- with this line the master start a read/write procedure (1 to start)
+      regOp                  => regOp,  -- this line define if the procedure is read or write (1 to write)
+      regAddr                => RegAddr,  -- address bus
+      statusReg              => StatusReg,  -- status reg bus. The RCI handle this bus and this machine pass it to the sure if he wants to read it
+      regWrEn                => RegWrEn,  -- write enable bus. This bus enables the data write bits
+      regDataWr_masked       => regDataWr_masked,  -- data write bus masked. Is the logical AND of data write bus and write enable bus
+      regAck                 => regAck,  -- acknowledge line to activate when the read/write procedure is completed
+      regFail                => regFail,  -- line to activate when an error occurs during the read/write procedure
+      regDataRd              => RegDataRd,  -- data bus to RCI used to transfer read data
+      StatusReset            => StatusRst,  -- status block reset
 -- Base Register Set signals            
-      busy_bus                     => busy_bus,  -- busy bus is composed by the different register sets busy
-      time_base_actual_value       => time_base_actual_value,  -- time base value 
-      trig_tm_value_SB             => trig_tm_value_SB,  -- Status Block trigger time 
-      trig_tm_value_TB             => trig_tm_value_TB,  -- Time Base trigger time
-      trig_tm_value_seq            => trig_tm_value_seq,  -- Sequencer Trigger time
-      trig_tm_value_V_I            => trig_tm_value_V_I,  -- Voltage and current sens trigger time
-      trig_tm_value_pcb_t          => trig_tm_value_pcb_t,  -- PCB temperature Trigger time
+      busy_bus               => busy_bus,  -- busy bus is composed by the different register sets busy
+      time_base_actual_value => time_base_actual_value,  -- time base value 
+      trig_tm_value_SB       => trig_tm_value_SB,  -- Status Block trigger time 
+      trig_tm_value_TB       => trig_tm_value_TB,  -- Time Base trigger time
+      trig_tm_value_seq      => trig_tm_value_seq,  -- Sequencer Trigger time
+      trig_tm_value_V_I      => trig_tm_value_V_I,  -- Voltage and current sens trigger time
+      trig_tm_value_pcb_t    => trig_tm_value_pcb_t,  -- PCB temperature Trigger time
 --      trig_tm_value_f_adc      => trig_tm_value_fast_adc,  -- fast ADC Trigger time
-      trigger_ce_bus               => trigger_ce_bus,  -- bus to enable register sets trigger. To trigger a register set that stops itself use en AND val                                      
-      trigger_val_bus              => trigger_val_bus,  -- bus of register sets trigger values  
-      load_time_base_lsw           => load_time_base_lsw,  -- ce signal to load the time base lsw
-      load_time_base_MSW           => load_time_base_MSW,  -- ce signal to load the time base MSW
-      cnt_preset                   => cnt_preset,  -- preset value for the time base counter
-      Mgt_avcc_ok                  => '0',
-      Mgt_accpll_ok                => '0',
-      Mgt_avtt_ok                  => '0',
-      V3_3v_ok                     => '0',
-      Switch_addr                  => r_add,
+      trigger_ce_bus         => trigger_ce_bus,  -- bus to enable register sets trigger. To trigger a register set that stops itself use en AND val                                      
+      trigger_val_bus        => trigger_val_bus,  -- bus of register sets trigger values  
+      load_time_base_lsw     => load_time_base_lsw,  -- ce signal to load the time base lsw
+      load_time_base_MSW     => load_time_base_MSW,  -- ce signal to load the time base MSW
+      cnt_preset             => cnt_preset,  -- preset value for the time base counter
+      Mgt_avcc_ok            => '0',
+      Mgt_accpll_ok          => '0',
+      Mgt_avtt_ok            => '0',
+      V3_3v_ok               => '0',
+      Switch_addr            => r_add,
       -- sync commands 
-      sync_cmd_delay_en            => sync_cmd_delay_en,
-      sync_cmd_delay_read          => sync_cmd_delay_read,
+      sync_cmd_delay_en      => sync_cmd_delay_en,
+      sync_cmd_delay_read    => sync_cmd_delay_read,
+
+      -- interrupt commands
+      interrupt_mask_wr_en => mask_bus_in_en,
+      interrupt_mask_read  => mask_bus_out,
+
 -- Image parameters
       image_size                   => x"00000000",  -- this register contains the image size (no longer used)
       image_patter_read            => image_patter_read,  -- this register gives the state of image patter gen. 1 is ON
@@ -2088,6 +2097,8 @@ begin
       mask_bus_out      => mask_bus_out,
       interrupt_en_out  => interrupt_en_out,
       interrupt_bus_out => interrupt_bus_out); 
+
+  start_add_prog_mem_in <= "000" & sync_cmd_main_add & "00";
 
 -- CCD 1
   sequencer_v4_ccd1 : sequencer_v4_top
