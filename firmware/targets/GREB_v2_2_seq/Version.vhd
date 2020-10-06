@@ -23,9 +23,9 @@ package Version is
 -------------------------------------------------------------------------------
   -- 202c2000 GREB v2 first version
 
-  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"21382107"; -- MAKE_VERSION
+  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"21382108"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2015.3 (x86_64) Built Fri Feb 21 12:24:50 CET 2020 by srusso";
+constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2015.3 (x86_64) Built Tue Oct  6 11:36:36 CEST 2020 by srusso";
 
 end Version;
 
@@ -41,5 +41,6 @@ end Version;
 -- 2006 GREB v2 one sequencer, sync cmd, LAMs added and one wire serial number
 --              corrected
 -- 2106 GREB v2 same as 2006 but with 2 indipendent sequencers
--- 2007 GREB v2 mask on look at me corrected 
+-- 2007 GREB v2 mask on look at me corrected
+-- 2008 GREB v2 video ADC data from CCD 0 sent to VC0 and data from CCD 1 sent to VC1  
 -------------------------------------------------------------------------------

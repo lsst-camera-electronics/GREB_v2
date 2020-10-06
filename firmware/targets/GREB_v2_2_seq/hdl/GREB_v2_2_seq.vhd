@@ -2138,7 +2138,7 @@ begin
       test_mode_in    => regDataWr_masked(0),  -- test mode in 
       en_load_ccd_sel => '1',  -- for GREB only two stripes are active  register enable for CCD enable
       -- #### Set only for noise test. Revert to x"001" when done ####
-      ccd_sel_in      => "011",  -- for GREB with 2 sequencers only first stripe active register to select which CCD acquire (1, 2 or 3)                                   -- 
+      ccd_sel_in      => "001",  -- for GREB with 2 sequencers only first stripe active register to select which CCD acquire (1, 2 or 3)                                   -- 
       ccd_sel_out     => open,  -- register to select which CCD acquire (1, 2 or 3)
 
       -- DAQ v32  

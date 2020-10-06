@@ -2199,99 +2199,99 @@ begin
       );
 
 -- CCD 2
-  sequencer_v4_ccd2 : sequencer_v4_top
-    -- sequencer_v3_ccd_2 : sequencer_v3_top
-    port map (
-      reset                    => sync_res,
-      clk                      => clk_100_MHz,
-      start_sequence           => seq_start,
-      program_mem_we           => seq_1_prog_mem_w_en,
-      seq_mem_w_add            => regAddr(9 downto 0),
-      seq_mem_data_in          => regDataWr_masked,
-      prog_mem_redbk           => seq_1_prog_mem_readbk,
-      program_mem_init_add_in  => start_add_prog_mem_in,
-      --program_mem_init_en      => seq_1_start_add_prog_mem_en,
-      program_mem_init_add_rbk => seq_1_start_add_prog_mem_rbk,
-      ind_func_mem_we          => seq_1_ind_func_mem_we,
-      ind_func_mem_redbk       => seq_1_ind_func_mem_rdbk,
-      ind_rep_mem_we           => seq_1_ind_rep_mem_we,
-      ind_rep_mem_redbk        => seq_1_ind_rep_mem_rdbk,
-      ind_sub_add_mem_we       => seq_1_ind_sub_add_mem_we,
-      ind_sub_add_mem_redbk    => seq_1_ind_sub_add_mem_rdbk,
-      ind_sub_rep_mem_we       => seq_1_ind_sub_rep_mem_we,
-      ind_sub_rep_mem_redbk    => seq_1_ind_sub_rep_mem_rdbk,
-      time_mem_w_en            => seq_1_time_mem_w_en,
-      time_mem_readbk          => seq_1_time_mem_readbk,
-      out_mem_w_en             => seq_1_out_mem_w_en,
-      out_mem_readbk           => seq_1_out_mem_readbk,
-      stop_sequence            => seq_1_stop,
-      step_sequence            => seq_1_step,
-      op_code_error_reset      => seq_1_op_code_error_reset,
-      op_code_error            => seq_1_op_code_error,
-      op_code_error_add        => seq_1_op_code_error_add,
-      sequencer_busy           => sequencer_1_busy,
-      sequencer_out            => sequencer_1_outputs_int,
-      end_sequence             => seq_1_end_sequence
---       CScopeControl => CONTROL1
-      );
+--  sequencer_v4_ccd2 : sequencer_v4_top
+--    -- sequencer_v3_ccd_2 : sequencer_v3_top
+--    port map (
+--      reset                    => sync_res,
+--      clk                      => clk_100_MHz,
+--      start_sequence           => seq_start,
+--      program_mem_we           => seq_1_prog_mem_w_en,
+--      seq_mem_w_add            => regAddr(9 downto 0),
+--      seq_mem_data_in          => regDataWr_masked,
+--      prog_mem_redbk           => seq_1_prog_mem_readbk,
+--      program_mem_init_add_in  => start_add_prog_mem_in,
+--      --program_mem_init_en      => seq_1_start_add_prog_mem_en,
+--      program_mem_init_add_rbk => seq_1_start_add_prog_mem_rbk,
+--      ind_func_mem_we          => seq_1_ind_func_mem_we,
+--      ind_func_mem_redbk       => seq_1_ind_func_mem_rdbk,
+--      ind_rep_mem_we           => seq_1_ind_rep_mem_we,
+--      ind_rep_mem_redbk        => seq_1_ind_rep_mem_rdbk,
+--      ind_sub_add_mem_we       => seq_1_ind_sub_add_mem_we,
+--      ind_sub_add_mem_redbk    => seq_1_ind_sub_add_mem_rdbk,
+--      ind_sub_rep_mem_we       => seq_1_ind_sub_rep_mem_we,
+--      ind_sub_rep_mem_redbk    => seq_1_ind_sub_rep_mem_rdbk,
+--      time_mem_w_en            => seq_1_time_mem_w_en,
+--      time_mem_readbk          => seq_1_time_mem_readbk,
+--      out_mem_w_en             => seq_1_out_mem_w_en,
+--      out_mem_readbk           => seq_1_out_mem_readbk,
+--      stop_sequence            => seq_1_stop,
+--      step_sequence            => seq_1_step,
+--      op_code_error_reset      => seq_1_op_code_error_reset,
+--      op_code_error            => seq_1_op_code_error,
+--      op_code_error_add        => seq_1_op_code_error_add,
+--      sequencer_busy           => sequencer_1_busy,
+--      sequencer_out            => sequencer_1_outputs_int,
+--      end_sequence             => seq_1_end_sequence
+----       CScopeControl => CONTROL1
+--      );
 
-  sequencer_aligner_shifter_ccd_2 : sequencer_aligner_shifter_top
-    generic map(start_adc_bit => 12)
-    port map (
-      clk           => clk_100_Mhz,
-      reset         => sync_res,
-      shift_on_en   => seq_1_enable_conv_shift,
-      shift_on      => regDataWr_masked(0),
-      init_shift    => seq_1_init_conv_shift,
-      sequencer_in  => sequencer_1_outputs_int,
-      shift_on_out  => seq_1_enable_conv_shift_out,
-      sequencer_out => sequencer_1_outputs
-      );
+--  sequencer_aligner_shifter_ccd_2 : sequencer_aligner_shifter_top
+--    generic map(start_adc_bit => 12)
+--    port map (
+--      clk           => clk_100_Mhz,
+--      reset         => sync_res,
+--      shift_on_en   => seq_1_enable_conv_shift,
+--      shift_on      => regDataWr_masked(0),
+--      init_shift    => seq_1_init_conv_shift,
+--      sequencer_in  => sequencer_1_outputs_int,
+--      shift_on_out  => seq_1_enable_conv_shift_out,
+--      sequencer_out => sequencer_1_outputs
+--      );
 
-  Image_data_handler_ccd_2 : ADC_data_handler_v4
-    port map (
-      reset           => sync_res,
-      clk             => clk_100_Mhz,
-      testmode_rst    => pattern_reset_ccd_2,
-      testmode_col    => sequencer_1_outputs(8),
-      start_of_img    => start_of_img_ccd_2,  -- this signal is generated by the user (using the sequencer) and has to arrive before the first trigger 
-      end_of_img      => end_of_img_ccd_2,  -- this signal is generated by the user (using the sequencer) and has to arrive after the last  ADC trasfer 
-      end_sequence    => seq_1_end_sequence,  -- this signal is the end of sequence generated by the sequencer and is used as a timeot to generate EOF.
-      trigger         => ADC_trigger_ccd_2,  -- this signal start the operations (ADC conv and send data to PGP)
-      en_test_mode    => image_pattern_en,  -- register enable for pattern test mode
-      test_mode_in    => regDataWr_masked(0),  -- test mode in 
-      en_load_ccd_sel => '1',  -- for GREB only two stripes are active  register enable for CCD enable
-      ccd_sel_in      => "010",  -- for GREB with 2 sequencers only second stripe active register to select which CCD acquire (1, 2 or 3) 
-      ccd_sel_out     => open,  -- register to select which CCD acquire (1, 2 or 3)
+--  Image_data_handler_ccd_2 : ADC_data_handler_v4
+--    port map (
+--      reset           => sync_res,
+--      clk             => clk_100_Mhz,
+--      testmode_rst    => pattern_reset_ccd_2,
+--      testmode_col    => sequencer_1_outputs(8),
+--      start_of_img    => start_of_img_ccd_2,  -- this signal is generated by the user (using the sequencer) and has to arrive before the first trigger 
+--      end_of_img      => end_of_img_ccd_2,  -- this signal is generated by the user (using the sequencer) and has to arrive after the last  ADC trasfer 
+--      end_sequence    => seq_1_end_sequence,  -- this signal is the end of sequence generated by the sequencer and is used as a timeot to generate EOF.
+--      trigger         => ADC_trigger_ccd_2,  -- this signal start the operations (ADC conv and send data to PGP)
+--      en_test_mode    => image_pattern_en,  -- register enable for pattern test mode
+--      test_mode_in    => regDataWr_masked(0),  -- test mode in 
+--      en_load_ccd_sel => '1',  -- for GREB only two stripes are active  register enable for CCD enable
+--      ccd_sel_in      => "010",  -- for GREB with 2 sequencers only second stripe active register to select which CCD acquire (1, 2 or 3) 
+--      ccd_sel_out     => open,  -- register to select which CCD acquire (1, 2 or 3)
 
-      -- DAQ v32 
-      --SOT               => dataSOT_ccd_2,   -- Start of Image
-      --EOT               => dataEOT_ccd_2,   -- End of Image
-      --write_enable      => dataWrEn_ccd_2,  -- signal to write the image in the PGP
-      --data_out          => image_in_ccd_2,  -- 18 bits ADC word
+--      -- DAQ v32 
+--      --SOT               => dataSOT_ccd_2,   -- Start of Image
+--      --EOT               => dataEOT_ccd_2,   -- End of Image
+--      --write_enable      => dataWrEn_ccd_2,  -- signal to write the image in the PGP
+--      --data_out          => image_in_ccd_2,  -- 18 bits ADC word
 
-      -- DAQ v36 and beyond
-      SOT          => SCI_DataIn(1).sot,   -- Start of Image
-      EOT          => SCI_DataIn(1).eot,   -- End of Image
-      write_enable => SCI_DataIn(1).wrEn,  -- signal to write the image in the PGP
-      data_out     => SCI_DataIn(1).data,
+--      -- DAQ v36 and beyond
+--      SOT          => SCI_DataIn(1).sot,   -- Start of Image
+--      EOT          => SCI_DataIn(1).eot,   -- End of Image
+--      write_enable => SCI_DataIn(1).wrEn,  -- signal to write the image in the PGP
+--      data_out     => SCI_DataIn(1).data,
 
-      test_mode_enb_out => open,
-      adc_data_ccd_1    => x"0000",     -- CCD ADC data 
-      adc_cnv_ccd_1     => open,        -- ADC conv
-      adc_sck_ccd_1     => open,        -- ADC serial clock
--- Onw sequencer 
-      adc_data_ccd_2    => x"0000",     -- CCD ADC data 
-      adc_cnv_ccd_2     => open,        -- ADC conv
-      adc_sck_ccd_2     => open,        -- ADC serial clock
--- Two sequencers
-      --adc_data_ccd_2    => adc_data_ccd_2,  -- CCD ADC data 
-      --adc_cnv_ccd_2     => adc_cnv_ccd_2,   -- ADC conv
-      --adc_sck_ccd_2     => adc_sck_ccd_2,   -- ADC serial clock
-      adc_data_ccd_3    => x"0000",  -- for GREB only first stripe is active                                 -- CCD ADC data 
-      adc_cnv_ccd_3     => open,  -- for GREB only first stripe is active                         -- ADC conv
-      adc_sck_ccd_3     => open  -- for GREB only first stripe is active                         -- ADC serial clock
-      );
+--      test_mode_enb_out => open,
+--      adc_data_ccd_1    => x"0000",     -- CCD ADC data 
+--      adc_cnv_ccd_1     => open,        -- ADC conv
+--      adc_sck_ccd_1     => open,        -- ADC serial clock
+---- Onw sequencer 
+--      adc_data_ccd_2    => x"0000",     -- CCD ADC data 
+--      adc_cnv_ccd_2     => open,        -- ADC conv
+--      adc_sck_ccd_2     => open,        -- ADC serial clock
+---- Two sequencers
+--      --adc_data_ccd_2    => adc_data_ccd_2,  -- CCD ADC data 
+--      --adc_cnv_ccd_2     => adc_cnv_ccd_2,   -- ADC conv
+--      --adc_sck_ccd_2     => adc_sck_ccd_2,   -- ADC serial clock
+--      adc_data_ccd_3    => x"0000",  -- for GREB only first stripe is active                                 -- CCD ADC data 
+--      adc_cnv_ccd_3     => open,  -- for GREB only first stripe is active                         -- ADC conv
+--      adc_sck_ccd_3     => open  -- for GREB only first stripe is active                         -- ADC serial clock
+--      );
 
   aspic_3_spi_link_top_mux_0 : aspic_3_spi_link_top_mux
     port map (
