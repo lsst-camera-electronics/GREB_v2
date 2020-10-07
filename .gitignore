@@ -43,7 +43,12 @@ xst
 xlnx_auto*
 _xmsgs
 *~
+*.bit.gz
+*.mcs.gz
 
 old/
 ./firmware/modules/LSST_common/lsst_sim/firmware_old
 ./firmware/build
+firmware/modules/LSST_common/look_at_me_old/
+firmware/modules/LSST_common/lsst_sim/firmware_old/
+firmware/build
