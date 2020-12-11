@@ -46,10 +46,10 @@ entity GREB_v2 is
     --sysclk_m    : in std_logic;
 
     ------ PGP signals ------
-    PgpRx_p : in  std_logic;
-    PgpRx_m : in  std_logic;
-    PgpTx_p : out std_logic;
-    PgpTx_m : out std_logic;
+    PgpRx_P : in  std_logic_vector(1 downto 0);
+    PgpRx_M : in  std_logic_vector(1 downto 0);
+    PgpTx_P : out std_logic_vector(1 downto 0);
+    PgpTx_M : out std_logic_vector(1 downto 0);
 
     ------ CCD 1 -----
 
@@ -272,10 +272,10 @@ architecture Behavioral of GREB_v2 is
       FpgaRstL : in std_logic;
 
       PgpRefClk : in  std_logic;
-      PgpRxP    : in  std_logic;
-      PgpRxM    : in  std_logic;
-      PgpTxP    : out std_logic;
-      PgpTxM    : out std_logic;
+      PgpRxP    : in  std_logic_vector(1 downto 0);
+      PgpRxM    : in  std_logic_vector(1 downto 0);
+      PgpTxP    : out std_logic_vector(1 downto 0);
+      PgpTxM    : out std_logic_vector(1 downto 0);
 
       -------------------------------------------------------------------------
       -- Clock/Reset Generator Interface
@@ -1715,10 +1715,10 @@ begin
       PgpRefClk => PgpRefClk,
 
 
-      PgpRxP => PgpRx_p,
-      PgpRxM => PgpRx_m,
-      PgpTxP => PgpTx_p,
-      PgpTxM => PgpTx_m,
+      PgpRxP => PgpRx_P,
+      PgpRxM => PgpRx_M,
+      PgpTxP => PgpTx_P,
+      PgpTxM => PgpTx_M,
       -------------------------------------------------------------------------
       -- Clock/Reset Generator Interface
       -------------------------------------------------------------------------
