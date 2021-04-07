@@ -20,7 +20,7 @@ firmware/modules/LSST_common/look_at_me/rtl/TB/work/
 firmware/build
 #firmware/modules/LSST_common/lsst_sim/firmware/modules/StdLib/build/
 firmware/modules/LSST_common/lsst_sim/firmware_old_from_myvivado/modules/StdLib/build/
-firmware/modules/commonlib-v32/StdLib/build/
+#firmware/modules/commonlib-v32/StdLib/build/
 firmware/modules/LSST_common/look_at_me_old/
 firmware/modules/old/
 firmware/modules/old_old/
