@@ -1,0 +1,2 @@
+vhdl work rtl/GREB_v2_commands_package_2_seq.vhd
+vhdl work rtl/GREB_v2_cmd_interpreter_2_seq.vhd

@@ -1,0 +1,6 @@
+vhdl work rtl/ltc2945_multi_read_top_greb.vhd
+vhdl work rtl/ltc2945_multi_read_greb_fsm.vhd
+vhdl work rtl/i2c_core/i2c_top.vhd
+vhdl work rtl/i2c_core/i2c_master.vhd
+vhdl work rtl/i2c_core/i2c_handler_fsm.vhd
+vhdl work rtl/i2c_core/mux_bus_2_8_bit_clk.vhd

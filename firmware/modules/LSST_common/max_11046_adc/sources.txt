@@ -1,0 +1,5 @@
+vhdl work rtl/max_11046_multiple_3_top.vhd
+vhdl work rtl/max_11046_multi_ctrl_fsm.vhd
+vhdl work rtl/max_11046_top_package.vhd
+vhdl work rtl/demux_1_4_clk_pres.vhd
+vhdl work rtl/mux_4_1_clk.vhd

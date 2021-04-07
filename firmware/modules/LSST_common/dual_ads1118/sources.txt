@@ -1,0 +1,5 @@
+vhdl work rtl/dual_ads1118_top_package.vhd
+vhdl work rtl/dual_ads1118_top.vhd
+vhdl work rtl/dual_ads1118_controller_fsm.vhd
+vhdl work rtl/SPI_read_write_noss.vhd
+#vhdl work rtl/demux_1_2_clk_def_1.vhd
