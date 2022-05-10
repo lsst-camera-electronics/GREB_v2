@@ -23,9 +23,9 @@ package Version is
 -------------------------------------------------------------------------------
   -- 202c2000 GREB v2 first version
 
-  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"21392008"; -- MAKE_VERSION
+  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"21392009"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "GREB_v2: Vivado v2015.3 (x86_64) Built Fri Dec 11 14:16:46 CET 2020 by srusso";
+constant BUILD_STAMP_C : string := "GREB_v2: Vivado v2018.3 (x86_64) Built Tue May 10 13:08:40 PDT 2022 by jgt";
 
 end Version;
 
@@ -42,4 +42,6 @@ end Version;
 --              corrected
 -- 2007 GREB v2 mask on look at me corrected
 -- 2008 GREB v2 video ADC data sent to only the first VC and LAMs order corrected
+-- 2009 GREB Added STOP Synchronous command 0x30
+--           Fixed bug that caused 160ns of 0 on output when entering default state
 -------------------------------------------------------------------------------
