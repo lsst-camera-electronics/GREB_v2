@@ -330,7 +330,7 @@ set_property IOSTANDARD LVDS [get_ports  ccd1_clk_en_out_n]
 set_property PACKAGE_PIN AD11 [get_ports ccd2_clk_en_out_p]
 set_property IOSTANDARD LVDS [get_ports  ccd2_clk_en_out_p]
 set_property PACKAGE_PIN AE11 [get_ports ccd2_clk_en_out_n]
-7 gtx manualset_property IOSTANDARD LVDS [get_ports  ccd2_clk_en_out_n]
+set_property IOSTANDARD LVDS [get_ports  ccd2_clk_en_out_n]
 
 #ASPIC reference enable (Bank 14)
 set_property PACKAGE_PIN D24 [get_ports ASPIC_ref_sd_ccd1]

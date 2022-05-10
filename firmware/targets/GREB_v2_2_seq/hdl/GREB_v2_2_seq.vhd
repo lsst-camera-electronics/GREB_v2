@@ -632,6 +632,8 @@ architecture Behavioral of GREB_v2_2_seq is
                                            -- 1 clk with respect to sync_cmd_main_add
       sync_cmd_step_seq  : out std_logic;  -- this signal is delayed buy at least
                                            -- 1 clk with respect to sync_cmd_main_add
+      sync_cmd_stop_seq  : out std_logic;  -- this signal is delayed buy at least
+                                           -- 1 clk with respect to sync_cmd_main_add
       sync_cmd_main_add  : out std_logic_vector(4 downto 0)
       );
   end component;
@@ -1131,6 +1133,7 @@ architecture Behavioral of GREB_v2_2_seq is
   --signal sync_cmd_out        : std_logic_vector(7 downto 0);
   signal sync_cmd_start_seq  : std_logic;
   signal sync_cmd_step_seq   : std_logic;
+  signal sync_cmd_stop_seq   : std_logic;
   signal sync_cmd_main_add   : std_logic_vector(4 downto 0);
   signal sync_cmd_delay_en   : std_logic;
   signal sync_cmd_delay_read : std_logic_vector(7 downto 0);
@@ -1158,6 +1161,7 @@ architecture Behavioral of GREB_v2_2_seq is
   signal sequencer_busy_or            : std_logic;
   signal start_add_prog_mem_in        : std_logic_vector(9 downto 0);
   signal seq_step_cmd                 : std_logic;
+  signal seq_stop_cmd                 : std_logic;
   -- sequencer 0
   signal sequencer_0_busy             : std_logic;
   signal seq_0_time_mem_readbk        : std_logic_vector(15 downto 0);
@@ -1168,6 +1172,7 @@ architecture Behavioral of GREB_v2_2_seq is
   signal seq_0_prog_mem_w_en          : std_logic;
   signal seq_0_step_cmd               : std_logic;
   signal seq_0_step                   : std_logic;
+  signal seq_0_stop_cmd               : std_logic;
   signal seq_0_stop                   : std_logic;
   signal sequencer_0_outputs          : std_logic_vector(31 downto 0);
   signal sequencer_0_outputs_int      : std_logic_vector(31 downto 0);
@@ -1199,6 +1204,7 @@ architecture Behavioral of GREB_v2_2_seq is
   signal seq_1_prog_mem_w_en          : std_logic;
   signal seq_1_step_cmd               : std_logic;
   signal seq_1_step                   : std_logic;
+  signal seq_1_stop_cmd               : std_logic;
   signal seq_1_stop                   : std_logic;
   signal sequencer_1_outputs          : std_logic_vector(31 downto 0);
   signal sequencer_1_outputs_int      : std_logic_vector(31 downto 0);
@@ -1489,6 +1495,9 @@ begin
 
   seq_0_step <= seq_0_step_cmd or sync_cmd_step_seq;
   seq_1_step <= seq_1_step_cmd or sync_cmd_step_seq;
+
+  seq_0_stop <= seq_0_stop_cmd or sync_cmd_stop_seq;
+  seq_1_stop <= seq_1_stop_cmd or sync_cmd_stop_seq;
 
 -- temperature signals
   temp_busy <= DREB_temp_busy or REB_temp_busy_gr1 or REB_temp_busy_gr2;
@@ -1821,7 +1830,7 @@ begin
       seq_0_out_mem_w_en           => seq_0_out_mem_w_en,  -- this signal enables the output memory write
       seq_0_prog_mem_w_en          => seq_0_prog_mem_w_en,  -- this signal enables the program memory write
       seq_0_step                   => seq_0_step_cmd,  -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)   
-      seq_0_stop                   => seq_0_stop,  -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
+      seq_0_stop                   => seq_0_stop_cmd,  -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
       seq_0_enable_conv_shift_in   => seq_0_enable_conv_shift_out,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_0_enable_conv_shift      => seq_0_enable_conv_shift,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_0_init_conv_shift        => seq_0_init_conv_shift,  -- this signal initialize the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
@@ -1848,7 +1857,7 @@ begin
       seq_1_out_mem_w_en           => seq_1_out_mem_w_en,  -- this signal enables the output memory write
       seq_1_prog_mem_w_en          => seq_1_prog_mem_w_en,  -- this signal enables the program memory write
       seq_1_step                   => seq_1_step_cmd,  -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)   
-      seq_1_stop                   => seq_1_stop,  -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
+      seq_1_stop                   => seq_1_stop_cmd,  -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
       seq_1_enable_conv_shift_in   => seq_1_enable_conv_shift_out,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_1_enable_conv_shift      => seq_1_enable_conv_shift,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_1_init_conv_shift        => seq_1_init_conv_shift,  -- this signal initialize the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
@@ -2051,6 +2060,7 @@ begin
       sync_cmd           => sync_cmd_in,
       sync_cmd_start_seq => sync_cmd_start_seq,
       sync_cmd_step_seq  => sync_cmd_step_seq,
+      sync_cmd_stop_seq  => sync_cmd_stop_seq,
       sync_cmd_main_add  => sync_cmd_main_add
       );
 
