@@ -23,9 +23,9 @@ package Version is
 -------------------------------------------------------------------------------
   -- 202c2000 GREB v2 first version
 
-  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"21392109"; -- MAKE_VERSION
+  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"2139210A"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2018.3 (x86_64) Built Tue May 10 13:36:37 PDT 2022 by jgt";
+constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2018.3 (x86_64) Built Wed Jul 27 18:57:29 PDT 2022 by jgt";
 
 end Version;
 
@@ -45,4 +45,5 @@ end Version;
 -- 2008 GREB v2 video ADC data from CCD 0 sent to VC0 and data from CCD 1 sent to VC1  
 -- 2009 GREB Added STOP Synchronous command 0x30
 --           Fixed bug that caused 160ns of 0 on output when entering default state
+-- 200A GREB Added register START command that specifies a MAIN
 -------------------------------------------------------------------------------
