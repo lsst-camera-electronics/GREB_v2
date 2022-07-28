@@ -1159,7 +1159,6 @@ architecture Behavioral of GREB_v2_2_seq is
   -- sequencer signals
   signal seq_start                    : std_logic;
   signal sequencer_busy_or            : std_logic;
-  signal start_add_prog_mem_in        : std_logic_vector(9 downto 0);
   signal seq_step_cmd                 : std_logic;
   signal seq_stop_cmd                 : std_logic;
   -- sequencer 0
@@ -1180,8 +1179,9 @@ architecture Behavioral of GREB_v2_2_seq is
   signal seq_0_enable_conv_shift_out  : std_logic;
   signal seq_0_init_conv_shift        : std_logic;
   signal seq_0_end_sequence           : std_logic;
---  signal seq_0_start_add_prog_mem_en  : std_logic;
+  signal seq_0_start_add_prog_mem_en  : std_logic;
   signal seq_0_start_add_prog_mem_rbk : std_logic_vector(9 downto 0);
+  signal seq_0_start_add_prog_mem_in  : std_logic_vector(9 downto 0);
   signal seq_0_ind_func_mem_we        : std_logic;
   signal seq_0_ind_func_mem_rdbk      : std_logic_vector(3 downto 0);
   signal seq_0_ind_rep_mem_we         : std_logic;
@@ -1212,8 +1212,9 @@ architecture Behavioral of GREB_v2_2_seq is
   signal seq_1_enable_conv_shift_out  : std_logic;
   signal seq_1_init_conv_shift        : std_logic;
   signal seq_1_end_sequence           : std_logic;
---  signal seq_1_start_add_prog_mem_en  : std_logic;
+  signal seq_1_start_add_prog_mem_en  : std_logic;
   signal seq_1_start_add_prog_mem_rbk : std_logic_vector(9 downto 0);
+  signal seq_1_start_add_prog_mem_in  : std_logic_vector(9 downto 0);
   signal seq_1_ind_func_mem_we        : std_logic;
   signal seq_1_ind_func_mem_rdbk      : std_logic_vector(3 downto 0);
   signal seq_1_ind_rep_mem_we         : std_logic;
@@ -1484,7 +1485,7 @@ begin
   StatusAddr(23 downto 10) <= (others => '0');
   StatusAddr(9 downto 0)   <= regAddr(9 downto 0);
 
-  busy_bus <= x"000000" & '0' &sequencer_1_busy & sequencer_0_busy & temp_busy & V_I_busy & sequencer_0_busy & time_base_busy & '0';
+  busy_bus <= x"000000" & '0' &sequencer_1_busy & sequencer_0_busy & temp_busy & V_I_busy & sequencer_busy_or & time_base_busy & '0';
 
   sequencer_busy_or <= sequencer_1_busy or sequencer_0_busy;
 
@@ -1834,8 +1835,7 @@ begin
       seq_0_enable_conv_shift_in   => seq_0_enable_conv_shift_out,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_0_enable_conv_shift      => seq_0_enable_conv_shift,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_0_init_conv_shift        => seq_0_init_conv_shift,  -- this signal initialize the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-      seq_0_start_add_prog_mem_en  => open,
-      --   seq_0_start_add_prog_mem_en  => seq_0_start_add_prog_mem_en,
+      seq_0_start_add_prog_mem_en  => seq_0_start_add_prog_mem_en,
       seq_0_start_add_prog_mem_rbk => seq_0_start_add_prog_mem_rbk,
       seq_0_ind_func_mem_we        => seq_0_ind_func_mem_we,
       seq_0_ind_func_mem_rdbk      => seq_0_ind_func_mem_rdbk,
@@ -1861,8 +1861,7 @@ begin
       seq_1_enable_conv_shift_in   => seq_1_enable_conv_shift_out,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_1_enable_conv_shift      => seq_1_enable_conv_shift,  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
       seq_1_init_conv_shift        => seq_1_init_conv_shift,  -- this signal initialize the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-      seq_1_start_add_prog_mem_en  => open,
-      --  seq_1_start_add_prog_mem_en  => seq_1_start_add_prog_mem_en,
+      seq_1_start_add_prog_mem_en  => seq_1_start_add_prog_mem_en,
       seq_1_start_add_prog_mem_rbk => seq_1_start_add_prog_mem_rbk,
       seq_1_ind_func_mem_we        => seq_1_ind_func_mem_we,
       seq_1_ind_func_mem_rdbk      => seq_1_ind_func_mem_rdbk,
@@ -2082,7 +2081,9 @@ begin
       interrupt_en_out  => interrupt_en_out,
       interrupt_bus_out => interrupt_bus_out);
 
-      start_add_prog_mem_in <= "000" & sync_cmd_main_add & "00";
+      seq_0_start_add_prog_mem_in <= "000" & sync_cmd_main_add & "00" when sync_cmd_start_seq = '1' else
+                                     "000" & regDataWr_masked(4 downto 0) & "00" when seq_0_start_add_prog_mem_en = '1' else
+                                     (others => '0');
   
 -- CCD 1
   sequencer_v4_ccd1 : sequencer_v4_top
@@ -2090,12 +2091,12 @@ begin
     port map (
       reset                    => sync_res,
       clk                      => clk_100_MHz,
-      start_sequence           => seq_start,
+      start_sequence           => sync_cmd_start_seq or seq_0_start_add_prog_mem_en,
       program_mem_we           => seq_0_prog_mem_w_en,
       seq_mem_w_add            => regAddr(9 downto 0),
       seq_mem_data_in          => regDataWr_masked,
       prog_mem_redbk           => seq_0_prog_mem_readbk,
-      program_mem_init_add_in  => start_add_prog_mem_in,
+      program_mem_init_add_in  => seq_0_start_add_prog_mem_in,
       --program_mem_init_en      => seq_0_start_add_prog_mem_en,
       program_mem_init_add_rbk => seq_0_start_add_prog_mem_rbk,
       ind_func_mem_we          => seq_0_ind_func_mem_we,
@@ -2182,18 +2183,23 @@ begin
       adc_sck_ccd_3  => open  -- for GREB only first stripe is active                         -- ADC serial clock
       );
 
+
+  seq_1_start_add_prog_mem_in <= "000" & sync_cmd_main_add & "00" when sync_cmd_start_seq = '1' else
+                                 "000" & regDataWr_masked(4 downto 0) & "00" when seq_1_start_add_prog_mem_en = '1' else
+                                 (others => '0');
+
 -- CCD 2
   sequencer_v4_ccd2 : sequencer_v4_top
     -- sequencer_v3_ccd_2 : sequencer_v3_top
     port map (
       reset                    => sync_res,
       clk                      => clk_100_MHz,
-      start_sequence           => seq_start,
+      start_sequence           => sync_cmd_start_seq or seq_1_start_add_prog_mem_en,
       program_mem_we           => seq_1_prog_mem_w_en,
       seq_mem_w_add            => regAddr(9 downto 0),
       seq_mem_data_in          => regDataWr_masked,
       prog_mem_redbk           => seq_1_prog_mem_readbk,
-      program_mem_init_add_in  => start_add_prog_mem_in,
+      program_mem_init_add_in  => seq_1_start_add_prog_mem_in,
       --program_mem_init_en      => seq_1_start_add_prog_mem_en,
       program_mem_init_add_rbk => seq_1_start_add_prog_mem_rbk,
       ind_func_mem_we          => seq_1_ind_func_mem_we,
