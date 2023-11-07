@@ -8,8 +8,6 @@
 firmware/modules/LSST_common/look_at_me/rtl/TB/transcript
 firmware/modules/LSST_common/look_at_me/rtl/TB/work/
 #images compressed
-*.bit.gz
-*.mcs.gz
 
 #vivado files
 *.jou
