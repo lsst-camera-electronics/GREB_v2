@@ -23,9 +23,9 @@ package Version is
 -------------------------------------------------------------------------------
   -- 202c2000 GREB v2 first version
 
-  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"2139210C"; -- MAKE_VERSION
+  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"2139210B"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2018.3 (x86_64) Built Mon Nov  6 16:34:56 PST 2023 by jgt";
+constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2018.3 (x86_64) Built Wed Apr 26 09:51:38 PDT 2023 by jgt";
 
 end Version;
 
@@ -47,5 +47,4 @@ end Version;
 --           Fixed bug that caused 160ns of 0 on output when entering default state
 -- 200A GREB Added register START command that specifies a MAIN
 -- 200B GREB Added version number to bitfile
--- 200C GREB Fixed sensor ordering
 -------------------------------------------------------------------------------
