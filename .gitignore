@@ -1,8 +1,8 @@
 # temporary emacs files
-*.vhd~
-*.xdc~
-.gitignore~
-*.do~
+*~
+
+.DS_Store
+
 #simulation 
 *.wlf
 firmware/modules/LSST_common/look_at_me/rtl/TB/transcript
