@@ -22,9 +22,9 @@ package Version is
 -- Version History
 -------------------------------------------------------------------------------
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"2139210D"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"2139210E"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2018.3 (x86_64) Built Tue Jan 28 16:29:06 PST 2025 by jgt";
+constant BUILD_STAMP_C : string := "GREB_v2_2_seq: Vivado v2018.3 (x86_64) Built Wed Apr 30 16:34:25 PDT 2025 by jgt";
 
 end Version;
 
@@ -48,4 +48,5 @@ end Version;
 -- 200B GREB Added version number to bitfile
 -- 200C GREB swapped sensors (dead end/deprecated)
 -- 200D GREB Added enable mask for input to DataEncoder
+-- 200E GREB Added bias threshold readback and sequencer override
 -------------------------------------------------------------------------------
