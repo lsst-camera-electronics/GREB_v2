@@ -347,6 +347,11 @@ architecture Behavioral of GREB_v2 is
       image_size_en     : out std_logic;                      -- this line enables the register where the image size is written
       image_pattern_en  : out std_logic;                      -- this register enable the image patter gen. 1 is ON
       ccd_sel_en        : out std_logic;                      -- register enable for CCD acquisition selector
+      -- Sequencer defaults
+      ccd_1_seq_override_wr   : out std_logic;
+      ccd_2_seq_override_wr   : out std_logic;
+      ccd_1_seq_override_read : in std_logic_vector(31 downto 0);
+      ccd_2_seq_override_read : in std_logic_vector(31 downto 0);
       -- Sequencer 0
       seq_0_time_mem_readbk        : in  std_logic_vector(15 downto 0);  -- time memory read bus
       seq_0_out_mem_readbk         : in  std_logic_vector(31 downto 0);  -- time memory read bus
@@ -1040,6 +1045,11 @@ architecture Behavioral of GREB_v2 is
   signal seq_0_op_code_error_reset    : std_logic;
   signal seq_0_op_code_error_add      : std_logic_vector(9 downto 0);
 
+  signal ccd_1_seq_override_wr : std_logic;
+  signal ccd_1_seq_override    : std_logic_vector(31 downto 0);
+  signal ccd_2_seq_override_wr : std_logic;
+  signal ccd_2_seq_override    : std_logic_vector(31 downto 0);
+
   -- ASPIC config signals
   signal aspic_start_trans    : std_logic;
   signal aspic_start_reset    : std_logic;
@@ -1085,13 +1095,9 @@ architecture Behavioral of GREB_v2 is
   signal image_size_en       : std_logic;
   signal image_pattern_en    : std_logic;
   signal ADC_trigger_ccd_1   : std_logic;
-  signal ADC_trigger_ccd_2   : std_logic;
   signal start_of_img_ccd_1  : std_logic;
-  signal start_of_img_ccd_2  : std_logic;
   signal end_of_img_ccd_1    : std_logic;
-  signal end_of_img_ccd_2    : std_logic;
   signal pattern_reset_ccd_1 : std_logic;
-  signal pattern_reset_ccd_2 : std_logic;
 
   -- CCD clock rails DAC                  
   signal clk_rail_load_start : std_logic;
@@ -1327,20 +1333,19 @@ begin
 
   ------------ Sequencer's signals assignment ------------
   -- CCD 1
-  ASPIC_r_up_ccd_1    <= not sequencer_0_outputs(0);
-  ASPIC_r_down_ccd_1  <= not sequencer_0_outputs(1);
-  ASPIC_reset_ccd_1   <=     sequencer_0_outputs(2);
-  ASPIC_clamp_ccd_1   <=     sequencer_0_outputs(3);
+  ASPIC_r_up_ccd_1    <= not sequencer_0_outputs(0)  when ccd_1_seq_override(31) = '0' else not ccd_1_seq_override(0);
+  ASPIC_r_down_ccd_1  <= not sequencer_0_outputs(1)  when ccd_1_seq_override(31) = '0' else not ccd_1_seq_override(1);
+  ASPIC_reset_ccd_1   <=     sequencer_0_outputs(2)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(2);
+  ASPIC_clamp_ccd_1   <=     sequencer_0_outputs(3)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(3);
+  ser_clk_ccd_1(0)    <=     sequencer_0_outputs(4)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(4);
+  ser_clk_ccd_1(1)    <=     sequencer_0_outputs(5)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(5);
+  ser_clk_ccd_1(2)    <=     sequencer_0_outputs(6)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(6);
+  reset_gate_ccd_1    <=     sequencer_0_outputs(7)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(7);
+  par_clk_ccd_1(0)    <=     sequencer_0_outputs(8)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(8);
+  par_clk_ccd_1(1)    <=     sequencer_0_outputs(9)  when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(9);
+  par_clk_ccd_1(2)    <=     sequencer_0_outputs(10) when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(10);
+  par_clk_ccd_1(3)    <=     sequencer_0_outputs(11) when ccd_1_seq_override(31) = '0' else ccd_1_seq_override(11);
 
-  ser_clk_ccd_1(0)    <=     sequencer_0_outputs(4);
-  ser_clk_ccd_1(1)    <=     sequencer_0_outputs(5);
-  ser_clk_ccd_1(2)    <=     sequencer_0_outputs(6);
-  reset_gate_ccd_1    <=     sequencer_0_outputs(7);
-
-  par_clk_ccd_1(0)    <=     sequencer_0_outputs(8);
-  par_clk_ccd_1(1)    <=     sequencer_0_outputs(9);
-  par_clk_ccd_1(2)    <=     sequencer_0_outputs(10);
-  par_clk_ccd_1(3)    <=     sequencer_0_outputs(11);
 
   ADC_trigger_ccd_1   <=     sequencer_0_outputs(12);
   start_of_img_ccd_1  <=     sequencer_0_outputs(13);
@@ -1349,35 +1354,47 @@ begin
   pattern_reset_ccd_1 <=     sequencer_0_outputs(16);
 
   gpio_0_int <= sequencer_0_outputs(16);
-
   gpio_2 <= sequencer_0_outputs(16);
 
   -- CCD 2
-  ASPIC_r_up_ccd_2    <= not sequencer_0_outputs(0);
-  ASPIC_r_down_ccd_2  <= not sequencer_0_outputs(1);
-  ASPIC_reset_ccd_2   <=     sequencer_0_outputs(2);
-  ASPIC_clamp_ccd_2   <=     sequencer_0_outputs(3);
-
-  ser_clk_ccd_2(0)    <=     sequencer_0_outputs(4);
-  ser_clk_ccd_2(1)    <=     sequencer_0_outputs(5);
-  ser_clk_ccd_2(2)    <=     sequencer_0_outputs(6);
-  reset_gate_ccd_2    <=     sequencer_0_outputs(7);
-
-  par_clk_ccd_2(0)    <=     sequencer_0_outputs(8);
-  par_clk_ccd_2(1)    <=     sequencer_0_outputs(9);
-  par_clk_ccd_2(2)    <=     sequencer_0_outputs(10);
-  par_clk_ccd_2(3)    <=     sequencer_0_outputs(11);
-
-  ADC_trigger_ccd_2   <=     sequencer_0_outputs(12);
-  start_of_img_ccd_2  <=     sequencer_0_outputs(13);
-  end_of_img_ccd_2    <=     sequencer_0_outputs(14);
-  cabac_pulse_ccd_2   <=     sequencer_0_outputs(15);
-  pattern_reset_ccd_2 <=     sequencer_0_outputs(16);
+  ASPIC_r_up_ccd_2    <= not sequencer_0_outputs(0)  when ccd_2_seq_override(31) = '0' else not ccd_2_seq_override(0);
+  ASPIC_r_down_ccd_2  <= not sequencer_0_outputs(1)  when ccd_2_seq_override(31) = '0' else not ccd_2_seq_override(1);
+  ASPIC_reset_ccd_2   <=     sequencer_0_outputs(2)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(2);
+  ASPIC_clamp_ccd_2   <=     sequencer_0_outputs(3)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(3);
+  ser_clk_ccd_2(0)    <=     sequencer_0_outputs(4)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(4);
+  ser_clk_ccd_2(1)    <=     sequencer_0_outputs(5)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(5);
+  ser_clk_ccd_2(2)    <=     sequencer_0_outputs(6)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(6);
+  reset_gate_ccd_2    <=     sequencer_0_outputs(7)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(7);
+  par_clk_ccd_2(0)    <=     sequencer_0_outputs(8)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(8);
+  par_clk_ccd_2(1)    <=     sequencer_0_outputs(9)  when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(9);
+  par_clk_ccd_2(2)    <=     sequencer_0_outputs(10) when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(10);
+  par_clk_ccd_2(3)    <=     sequencer_0_outputs(11) when ccd_2_seq_override(31) = '0' else ccd_2_seq_override(11);
 
   gpio_1_int <= sequencer_0_outputs(17);
-
   test_port(2) <= sequencer_0_outputs_int(12);
 
+  -- sequencer defaults (only used when sensor is not selected)
+  ccd_1_sequencer_defaults : generic_reg_ce_init
+    generic map (width => 31)
+    port map (
+      reset    => usrRst,
+      clk      => usrClk,
+      ce       => ccd_1_seq_override_wr,
+      init     => '0',
+      data_in  => regDataWr_masked,
+      data_out => ccd_1_seq_override
+    );
+
+  ccd_2_sequencer_defaults : generic_reg_ce_init
+    generic map (width => 31)
+    port map (
+      reset    => usrRst,
+      clk      => usrClk,
+      ce       => ccd_2_seq_override_wr,
+      init     => '0',
+      data_in  => regDataWr_masked,
+      data_out => ccd_2_seq_override
+    );
 
   ------------ misc ------------
   enable_io <= '0';                     -- 1 = disable 
@@ -1538,6 +1555,11 @@ begin
       image_size_en                => open,  -- this line enables the register where the image size is written
       image_pattern_en             => image_pattern_en,  -- this register enable the image patter gen. 1 is ON
       ccd_sel_en                   => open,  -- on GREB only first two stripes are active                                                  -- register enable for CCD acquisition selector 
+      -- Sequencer Defaults
+      ccd_1_seq_override_wr         => ccd_1_seq_override_wr,
+      ccd_2_seq_override_wr         => ccd_2_seq_override_wr,
+      ccd_1_seq_override_read       => ccd_1_seq_override,
+      ccd_2_seq_override_read       => ccd_2_seq_override,
       -- Sequencer
       -- sequencer 0
       seq_0_time_mem_readbk        => seq_0_time_mem_readbk,  -- time memory read bus

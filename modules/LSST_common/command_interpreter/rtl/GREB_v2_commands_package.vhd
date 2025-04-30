@@ -56,6 +56,9 @@ package GREB_v2_commands_package is
   constant image_patter_mode_cmd : std_logic_vector(23 downto 0) := x"400006";
   constant ccd_sel_cmd           : std_logic_vector(23 downto 0) := x"400007";
 
+  constant ccd_1_seq_override_cmd : std_logic_vector(23 downto 0) := x"400010";
+  constant ccd_2_seq_override_cmd : std_logic_vector(23 downto 0) := x"400011";
+
 -- Status Register
   constant read_status_reg_base : std_logic_vector(23 downto 0) := x"A00000";
   constant read_status_reg_high : std_logic_vector(23 downto 0) := x"A003ff";
