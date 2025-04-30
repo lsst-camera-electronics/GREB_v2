@@ -22,7 +22,7 @@ use IEEE.STD_LOGIC_1164.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
@@ -30,7 +30,13 @@ use IEEE.STD_LOGIC_1164.all;
 --use UNISIM.VComponents.all;
 
 entity dual_ad53xx_DAC_protection_top is
-
+  generic (
+    GD_0_th : integer range 0 to 2**12-1 := 1138;  -- equivalent to x"472"
+    OD_0_th : integer range 0 to 2**12-1 := 2275;  -- equivalent to x"8E3"
+    RD_0_th : integer range 0 to 2**12-1 := 1632;  -- equivalent to x"660"
+    GD_1_th : integer range 0 to 2**12-1 := 1138;  -- equivalent to x"472"
+    OD_1_th : integer range 0 to 2**12-1 := 2275;  -- equivalent to x"8E3"
+    RD_1_th : integer range 0 to 2**12-1 := 1632); -- equivalent to x"660"
   port (
     clk             : in  std_logic;
     reset           : in  std_logic;
@@ -44,7 +50,13 @@ entity dual_ad53xx_DAC_protection_top is
     ss_dac_0        : out std_logic;
     ss_dac_1        : out std_logic;
     sclk            : out std_logic;
-    ldac            : out std_logic
+    ldac            : out std_logic;
+    gd_0_thresh     : out std_logic_vector(11 downto 0);
+    od_0_thresh     : out std_logic_vector(11 downto 0);
+    rd_0_thresh     : out std_logic_vector(11 downto 0);
+    gd_1_thresh     : out std_logic_vector(11 downto 0);
+    od_1_thresh     : out std_logic_vector(11 downto 0);
+    rd_1_thresh     : out std_logic_vector(11 downto 0)
     );
 
 end dual_ad53xx_DAC_protection_top;
@@ -101,12 +113,23 @@ architecture Behavioral of dual_ad53xx_DAC_protection_top is
   constant OD_add : std_logic_vector(3 downto 0) := x"5";
   constant RD_add : std_logic_vector(3 downto 0) := x"1";
 
-  constant GD_th : std_logic_vector(11 downto 0) := x"472";
-  constant OD_th : std_logic_vector(11 downto 0) := x"8E3";
-  constant RD_th : std_logic_vector(11 downto 0) := x"660";
+  signal GD_0_th_int : std_logic_vector(11 downto 0);
+  signal OD_0_th_int : std_logic_vector(11 downto 0);
+  signal RD_0_th_int : std_logic_vector(11 downto 0);
+  signal GD_1_th_int : std_logic_vector(11 downto 0);
+  signal OD_1_th_int : std_logic_vector(11 downto 0);
+  signal RD_1_th_int : std_logic_vector(11 downto 0);
 
 
 begin
+
+  -- Convert integer generics to std_logic_vector
+  GD_0_th_int <= std_logic_vector(to_unsigned(GD_0_th, 12));
+  OD_0_th_int <= std_logic_vector(to_unsigned(OD_0_th, 12));
+  RD_0_th_int <= std_logic_vector(to_unsigned(RD_0_th, 12));
+  GD_1_th_int <= std_logic_vector(to_unsigned(GD_1_th, 12));
+  OD_1_th_int <= std_logic_vector(to_unsigned(OD_1_th, 12));
+  RD_1_th_int <= std_logic_vector(to_unsigned(RD_1_th, 12));
 
   SPI_write_0 : SPI_write
     generic map (clk_divide  => 2,
@@ -121,9 +144,6 @@ begin
       sclk        => sclk
       );
 
-
-
-
 -------------------------------------------------------------------------------
 -- protection logic
 -------------------------------------------------------------------------------
@@ -137,7 +157,8 @@ begin
         values_under_th_i   <= (others => '1');
       else
         if start_write = '1' and d_to_slave(15 downto 12) = GD_add then
-          if d_to_slave(11 downto 0) < GD_th then
+          if (d_to_slave(16) = '0' and d_to_slave(11 downto 0) < GD_0_th_int) or 
+             (d_to_slave(16) = '1' and d_to_slave(11 downto 0) < GD_1_th_int) then
             if bbs_switch_on = '1' then
               start_write_delay_1 <= '0';
               d_to_slave_delay_1  <= (others => '0');
@@ -207,7 +228,8 @@ begin
           end if;
           
         elsif start_write = '1' and d_to_slave(15 downto 12) = OD_add then
-          if d_to_slave(11 downto 0) < OD_th then
+          if (d_to_slave(16) = '0' and d_to_slave(11 downto 0) < OD_0_th_int) or 
+             (d_to_slave(16) = '1' and d_to_slave(11 downto 0) < OD_1_th_int) then
             if bbs_switch_on = '1' then
               start_write_delay_1 <= '0';
               d_to_slave_delay_1  <= (others => '0');
@@ -280,7 +302,8 @@ begin
           
           
         elsif start_write = '1' and d_to_slave(15 downto 12) = RD_add then
-          if d_to_slave(11 downto 0) < RD_th then
+          if (d_to_slave(16) = '0' and d_to_slave(11 downto 0) < RD_0_th_int) or 
+             (d_to_slave(16) = '1' and d_to_slave(11 downto 0) < RD_1_th_int) then
             if bbs_switch_on = '1' then
               start_write_delay_1 <= '0';
               d_to_slave_delay_1  <= (others => '0');
@@ -360,11 +383,8 @@ begin
     end if;
   end process;
 
-
   command_error   <= command_error_i;
   values_under_th <= values_under_th_i;
-
-
 
   dac_selector_ff : ff_ce
     port map (
@@ -373,7 +393,6 @@ begin
       data_in  => d_to_slave(16),
       ce       => start_write,
       data_out => dac_selector); 
-
 
   ss_demux : demux_1_2_clk_def_1
     port map (
@@ -401,6 +420,14 @@ begin
       data_out => ldac_delay_2); 
 
   ldac <= not(ldac_delay_1 or ldac_delay_2);
+
+  -- readback outputs
+  gd_0_thresh <= GD_0_th_int;
+  od_0_thresh <= OD_0_th_int;
+  rd_0_thresh <= RD_0_th_int;
+  gd_1_thresh <= GD_1_th_int;
+  od_1_thresh <= OD_1_th_int;
+  rd_1_thresh <= RD_1_th_int;
 
 end Behavioral;
 

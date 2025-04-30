@@ -129,6 +129,13 @@ package GREB_v2_commands_package_2_seq is
   constant c_bias_ldac_cmd        : std_logic_vector(23 downto 0) := x"400101";
   constant c_bias_err_vut_cmd     : std_logic_vector(23 downto 0) := x"40010F";
 
+  constant ccd_1_gd_thresh_read_cmd : std_logic_vector(23 downto 0) := x"401100";
+  constant ccd_1_od_thresh_read_cmd : std_logic_vector(23 downto 0) := x"401105";
+  constant ccd_1_rd_thresh_read_cmd : std_logic_vector(23 downto 0) := x"401101";
+  constant ccd_2_gd_thresh_read_cmd : std_logic_vector(23 downto 0) := x"401110";
+  constant ccd_2_od_thresh_read_cmd : std_logic_vector(23 downto 0) := x"401115";
+  constant ccd_2_rd_thresh_read_cmd : std_logic_vector(23 downto 0) := x"401111";
+
 ---------- DREB voltage and current sensors
   constant V_DREB_voltage_cmd  : std_logic_vector(23 downto 0) := x"600000";
   constant V_DREB_current_cmd  : std_logic_vector(23 downto 0) := x"600001";
@@ -232,31 +239,5 @@ package GREB_v2_commands_package_2_seq is
 end GREB_v2_commands_package_2_seq;
 
 package body GREB_v2_commands_package_2_seq is
-
----- Example 1
---  function <function_name>  (signal <signal_name> : in <type_declaration>  ) return <type_declaration> is
---    variable <variable_name>     : <type_declaration>;
---  begin
---    <variable_name> := <signal_name> xor <signal_name>;
---    return <variable_name>; 
---  end <function_name>;
-
----- Example 2
---  function <function_name>  (signal <signal_name> : in <type_declaration>;
---                         signal <signal_name>   : in <type_declaration>  ) return <type_declaration> is
---  begin
---    if (<signal_name> = '1') then
---      return <signal_name>;
---    else
---      return 'Z';
---    end if;
---  end <function_name>;
-
----- Procedure Example
---  procedure <procedure_name>  (<type_declaration> <constant_name>  : in <type_declaration>) is
---    
---  begin
---    
---  end <procedure_name>;
 
 end GREB_v2_commands_package_2_seq;

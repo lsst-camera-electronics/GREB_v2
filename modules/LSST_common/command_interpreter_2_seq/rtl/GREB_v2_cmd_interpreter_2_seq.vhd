@@ -169,6 +169,13 @@ entity GREB_v2_cmd_interpeter_2_seq is
         c_bias_load_start  : out std_logic;
         c_bias_ldac_start  : out std_logic;
 
+        ccd_1_bias_gd_thresh  : in std_logic_vector(11 downto 0);
+		ccd_1_bias_od_thresh  : in std_logic_vector(11 downto 0);
+		ccd_1_bias_rd_thresh  : in std_logic_vector(11 downto 0);
+		ccd_2_bias_gd_thresh  : in std_logic_vector(11 downto 0);
+		ccd_2_bias_od_thresh  : in std_logic_vector(11 downto 0);
+		ccd_2_bias_rd_thresh  : in std_logic_vector(11 downto 0);
+
 -- DREB voltage and current sensors
         error_V_HTR_voltage   : in std_logic;
         V_HTR_voltage         : in std_logic_vector(15 downto 0);
@@ -338,6 +345,8 @@ architecture Behavioral of GREB_v2_cmd_interpeter_2_seq is
 
 -- CABAC bias DAC       
                       c_bias_load_config_state, c_bias_ldac_state, c_bias_read_error_vut_state,
+                      ccd_1_gd_thresh_read_state, ccd_1_od_thresh_read_state, ccd_1_rd_thresh_read_state, 
+                      ccd_2_gd_thresh_read_state, ccd_2_od_thresh_read_state, ccd_2_rd_thresh_read_state, 
 
 -- DREB voltage and current sensors
                       V_HTR_voltage_state, V_HTR_current_state,
@@ -1128,8 +1137,23 @@ begin
             elsif regAddr = c_bias_err_vut_cmd then
               next_state <= c_bias_read_error_vut_state;
 
-              --elsif regAddr = ccd_bias_err_vut_cmd then
-              --  next_state <= ccd_bias_read_error_vut_state;
+            elsif regAddr = ccd_1_gd_thresh_read_cmd then
+              next_state <= ccd_1_gd_thresh_read_state;
+
+            elsif regAddr = ccd_1_od_thresh_read_cmd then
+              next_state <= ccd_1_od_thresh_read_state;
+
+            elsif regAddr = ccd_1_rd_thresh_read_cmd then
+              next_state <= ccd_1_rd_thresh_read_state;
+
+            elsif regAddr = ccd_2_gd_thresh_read_cmd then
+              next_state <= ccd_2_gd_thresh_read_state;
+
+            elsif regAddr = ccd_2_od_thresh_read_cmd then
+              next_state <= ccd_2_od_thresh_read_state;
+
+            elsif regAddr = ccd_2_rd_thresh_read_cmd then
+              next_state <= ccd_2_rd_thresh_read_state;
 
                                         --------REB voltage and current sensors read                           
                                         -- V_HTR voltage read
@@ -2181,6 +2205,31 @@ begin
         next_state     <= wait_end_cmd;
         next_regDataRd <= "0000" & x"0" & "00" & c_bias_v_undr_th & "0000" & x"0" & "00" & c_bias_dac_cmd_err;
         next_regAck    <= '1';
+
+      when ccd_1_gd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_1_bias_gd_thresh;
+      	next_regAck    <= '1';
+      when ccd_1_od_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_1_bias_od_thresh;
+      	next_regAck    <= '1';
+      when ccd_1_rd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_1_bias_rd_thresh;
+      	next_regAck    <= '1';
+      when ccd_2_gd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_2_bias_gd_thresh;
+      	next_regAck    <= '1';
+      when ccd_2_od_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_2_bias_od_thresh;
+      	next_regAck    <= '1';
+      when ccd_2_rd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_2_bias_rd_thresh;
+      	next_regAck    <= '1';
 
 ---------------------- DREB voltage and current sensors --------------------------      
       -- V_HTR voltage

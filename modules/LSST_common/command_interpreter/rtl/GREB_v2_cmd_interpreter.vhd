@@ -120,32 +120,6 @@ entity GREB_v2_cmd_interpeter is
         seq_0_op_code_error_add      : in  std_logic_vector(9 downto 0);
         seq_0_op_code_error_reset    : out std_logic;
 
-        -- sequencer 1
-        seq_1_time_mem_readbk        : in  std_logic_vector(15 downto 0);  -- time memory read bus
-        seq_1_out_mem_readbk         : in  std_logic_vector(31 downto 0);  -- time memory read bus
-        seq_1_prog_mem_readbk        : in  std_logic_vector(31 downto 0);  -- sequencer program memory read
-        seq_1_time_mem_w_en          : out std_logic;  -- this signal enables the time memory write
-        seq_1_out_mem_w_en           : out std_logic;  -- this signal enables the output memory write
-        seq_1_prog_mem_w_en          : out std_logic;  -- this signal enables the program memory write
-        seq_1_step                   : out std_logic;  -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)   
-        seq_1_stop                   : out std_logic;  -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
-        seq_1_enable_conv_shift_in   : in  std_logic;  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-        seq_1_enable_conv_shift      : out std_logic;  -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-        seq_1_init_conv_shift        : out std_logic;  -- this signal initialize the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-        seq_1_start_add_prog_mem_en  : out std_logic;
-        seq_1_start_add_prog_mem_rbk : in  std_logic_vector(9 downto 0);
-        seq_1_ind_func_mem_we        : out std_logic;
-        seq_1_ind_func_mem_rdbk      : in  std_logic_vector(3 downto 0);
-        seq_1_ind_rep_mem_we         : out std_logic;
-        seq_1_ind_rep_mem_rdbk       : in  std_logic_vector(23 downto 0);
-        seq_1_ind_sub_add_mem_we     : out std_logic;
-        seq_1_ind_sub_add_mem_rdbk   : in  std_logic_vector(9 downto 0);
-        seq_1_ind_sub_rep_mem_we     : out std_logic;
-        seq_1_ind_sub_rep_mem_rdbk   : in  std_logic_vector(15 downto 0);
-        seq_1_op_code_error          : in  std_logic;
-        seq_1_op_code_error_add      : in  std_logic_vector(9 downto 0);
-        seq_1_op_code_error_reset    : out std_logic;
-
 -- ASPIC
 
         aspic_config_r_ccd_1 : in  std_logic_vector(15 downto 0);
@@ -167,6 +141,13 @@ entity GREB_v2_cmd_interpeter is
         c_bias_v_undr_th   : in  std_logic_vector(5 downto 0);
         c_bias_load_start  : out std_logic;
         c_bias_ldac_start  : out std_logic;
+
+        ccd_1_bias_gd_thresh  : in std_logic_vector(11 downto 0);
+		ccd_1_bias_od_thresh  : in std_logic_vector(11 downto 0);
+		ccd_1_bias_rd_thresh  : in std_logic_vector(11 downto 0);
+		ccd_2_bias_gd_thresh  : in std_logic_vector(11 downto 0);
+		ccd_2_bias_od_thresh  : in std_logic_vector(11 downto 0);
+		ccd_2_bias_rd_thresh  : in std_logic_vector(11 downto 0);
 
 -- DREB voltage and current sensors
         error_V_HTR_voltage   : in std_logic;
@@ -337,6 +318,8 @@ architecture Behavioral of GREB_v2_cmd_interpeter is
 
 -- CABAC bias DAC       
                       c_bias_load_config_state, c_bias_ldac_state, c_bias_read_error_vut_state,
+                      ccd_1_gd_thresh_read_state, ccd_1_od_thresh_read_state, ccd_1_rd_thresh_read_state, 
+                      ccd_2_gd_thresh_read_state, ccd_2_od_thresh_read_state, ccd_2_rd_thresh_read_state, 
 
 -- DREB voltage and current sensors
                       V_HTR_voltage_state, V_HTR_current_state,
@@ -464,22 +447,6 @@ architecture Behavioral of GREB_v2_cmd_interpeter is
   signal next_seq_0_ind_sub_rep_mem_we    : std_logic;
   signal next_seq_0_op_code_error_reset   : std_logic;
 
-  -- sequencer 1
-  signal next_seq_1_time_mem_w_en         : std_logic;  -- function outupt register enable flag
-  signal next_seq_1_out_mem_w_en          : std_logic;  -- function time register enable flag
-  signal next_seq_1_prog_mem_w_en         : std_logic;  -- sequencer program memory enable flag
-  signal next_seq_1_step                  : std_logic;  -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)   
-  signal next_seq_1_stop                  : std_logic;  -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL and stop all function)   
-  signal next_seq_1_enable_conv_shift     : std_logic;
-  signal next_seq_1_init_conv_shift       : std_logic;
-  signal next_seq_1_start_add_prog_mem_en : std_logic;
-  signal next_seq_1_ind_func_mem_we       : std_logic;
-  signal next_seq_1_ind_rep_mem_we        : std_logic;
-  signal next_seq_1_ind_sub_add_mem_we    : std_logic;
-  signal next_seq_1_ind_sub_rep_mem_we    : std_logic;
-  signal next_seq_1_op_code_error_reset   : std_logic;
-
-
 -- ASPIC
   signal next_aspic_start_trans : std_logic;
   signal next_aspic_start_reset : std_logic;
@@ -579,21 +546,6 @@ begin
         seq_0_ind_sub_rep_mem_we    <= '0';
         seq_0_op_code_error_reset   <= '0';
 
-        -- sequencer 1
-        seq_1_time_mem_w_en         <= '0';
-        seq_1_out_mem_w_en          <= '0';
-        seq_1_prog_mem_w_en         <= '0';
-        seq_1_step                  <= '0';
-        seq_1_stop                  <= '0';
-        seq_1_enable_conv_shift     <= '0';
-        seq_1_init_conv_shift       <= '0';
-        seq_1_start_add_prog_mem_en <= '0';
-        seq_1_ind_func_mem_we       <= '0';
-        seq_1_ind_rep_mem_we        <= '0';
-        seq_1_ind_sub_add_mem_we    <= '0';
-        seq_1_ind_sub_rep_mem_we    <= '0';
-        seq_1_op_code_error_reset   <= '0';
-
         -- ASPIC
         aspic_start_trans <= '0';
         aspic_start_reset <= '0';
@@ -685,21 +637,6 @@ begin
         seq_0_ind_sub_add_mem_we    <= next_seq_0_ind_sub_add_mem_we;
         seq_0_ind_sub_rep_mem_we    <= next_seq_0_ind_sub_rep_mem_we;
         seq_0_op_code_error_reset   <= next_seq_0_op_code_error_reset;
-        -- sequencer 1
-        seq_1_time_mem_w_en         <= next_seq_1_time_mem_w_en;
-        seq_1_out_mem_w_en          <= next_seq_1_out_mem_w_en;
-        seq_1_prog_mem_w_en         <= next_seq_1_prog_mem_w_en;
-        seq_1_step                  <= next_seq_1_step;
-        seq_1_stop                  <= next_seq_1_stop;
-        seq_1_enable_conv_shift     <= next_seq_1_enable_conv_shift;
-        seq_1_init_conv_shift       <= next_seq_1_init_conv_shift;
-        seq_1_start_add_prog_mem_en <= next_seq_1_start_add_prog_mem_en;
-        seq_1_ind_func_mem_we       <= next_seq_1_ind_func_mem_we;
-        seq_1_ind_rep_mem_we        <= next_seq_1_ind_rep_mem_we;
-        seq_1_ind_sub_add_mem_we    <= next_seq_1_ind_sub_add_mem_we;
-        seq_1_ind_sub_rep_mem_we    <= next_seq_1_ind_sub_rep_mem_we;
-        seq_1_op_code_error_reset   <= next_seq_1_op_code_error_reset;
-
 
         -- ASPIC
         aspic_start_trans <= next_aspic_start_trans;
@@ -762,7 +699,6 @@ begin
 
   process (pres_state, regReq, regOP, RegAddr, regdatawr_masked, regwren, switch_addr, time_base_actual_value,
            busy_bus, trig_tm_value_sb, trig_tm_value_tb, trig_tm_value_seq, trig_tm_value_v_i, trig_tm_value_pcb_t,
-           --trig_tm_value_f_adc,
 
            -- CCD bias
            c_bias_dac_cmd_err, c_bias_v_undr_th,
@@ -775,9 +711,6 @@ begin
            seq_0_time_mem_readbk, seq_0_out_mem_readbk, seq_0_prog_mem_readbk, seq_0_ind_func_mem_rdbk,
            seq_0_ind_rep_mem_rdbk, seq_0_ind_sub_add_mem_rdbk, seq_0_ind_sub_rep_mem_rdbk, seq_0_op_code_error,
            seq_0_enable_conv_shift_in, seq_0_start_add_prog_mem_rbk, seq_0_op_code_error_add,
-           seq_1_time_mem_readbk, seq_1_out_mem_readbk, seq_1_prog_mem_readbk, seq_1_ind_func_mem_rdbk,
-           seq_1_ind_rep_mem_rdbk, seq_1_ind_sub_add_mem_rdbk, seq_1_ind_sub_rep_mem_rdbk, seq_1_op_code_error,
-           seq_1_enable_conv_shift_in, seq_1_start_add_prog_mem_rbk, seq_1_op_code_error_add,
            v3_3v_ok, aspic_config_r_ccd_1, aspic_config_r_ccd_2, aspic_config_r_ccd_3, aspic_op_end,
            error_v_htr_voltage, error_v_htr_current, error_v_dreb_voltage, error_v_dreb_current, error_v_clk_h_voltage,
            error_v_clk_h_current, error_v_ana_voltage, error_v_ana_current,
@@ -837,23 +770,6 @@ begin
     next_seq_0_ind_sub_rep_mem_we <= '0';
 
     next_seq_0_op_code_error_reset <= '0';
-
-    -- sequencer 1
-    next_seq_1_time_mem_w_en         <= '0';
-    next_seq_1_out_mem_w_en          <= '0';
-    next_seq_1_prog_mem_w_en         <= '0';
-    next_seq_1_step                  <= '0';
-    next_seq_1_stop                  <= '0';
-    next_seq_1_enable_conv_shift     <= '0';
-    next_seq_1_init_conv_shift       <= '0';
-    next_seq_1_start_add_prog_mem_en <= '0';
-
-    next_seq_1_ind_func_mem_we    <= '0';
-    next_seq_1_ind_rep_mem_we     <= '0';
-    next_seq_1_ind_sub_add_mem_we <= '0';
-    next_seq_1_ind_sub_rep_mem_we <= '0';
-
-    next_seq_1_op_code_error_reset <= '0';
 
                                         -- ASPIC
     next_aspic_start_trans <= '0';
@@ -1119,8 +1035,23 @@ begin
             elsif regAddr = c_bias_err_vut_cmd then
               next_state <= c_bias_read_error_vut_state;
 
-              --elsif regAddr = ccd_bias_err_vut_cmd then
-              --  next_state <= ccd_bias_read_error_vut_state;
+            elsif regAddr = ccd_1_gd_thresh_read_cmd then
+              next_state <= ccd_1_gd_thresh_read_state;
+
+            elsif regAddr = ccd_1_od_thresh_read_cmd then
+              next_state <= ccd_1_od_thresh_read_state;
+
+            elsif regAddr = ccd_1_rd_thresh_read_cmd then
+              next_state <= ccd_1_rd_thresh_read_state;
+
+            elsif regAddr = ccd_2_gd_thresh_read_cmd then
+              next_state <= ccd_2_gd_thresh_read_state;
+
+            elsif regAddr = ccd_2_od_thresh_read_cmd then
+              next_state <= ccd_2_od_thresh_read_state;
+
+            elsif regAddr = ccd_2_rd_thresh_read_cmd then
+              next_state <= ccd_2_rd_thresh_read_state;
 
                                         --------REB voltage and current sensors read                           
                                         -- V_HTR voltage read
@@ -1430,8 +1361,6 @@ begin
               next_state <= func_time_wr;
               if regAddr(12) = '0' then
                 next_seq_0_time_mem_w_en <= '1';
-              else
-                next_seq_1_time_mem_w_en <= '1';
               end if;
 
                                         -- function outputs write
@@ -1441,8 +1370,6 @@ begin
               next_state <= func_output_wr;
               if regAddr(12) = '0' then
                 next_seq_0_out_mem_w_en <= '1';
-              else
-                next_seq_1_out_mem_w_en <= '1';
               end if;
 
                                         -- program memory write                 
@@ -1452,8 +1379,6 @@ begin
               next_state <= seq_prog_mem_wr;
               if regAddr(12) = '0' then
                 next_seq_0_prog_mem_w_en <= '1';
-              else
-                next_seq_1_prog_mem_w_en <= '1';
               end if;
 
                                         -- sequencer step                       
@@ -1461,8 +1386,6 @@ begin
               next_state <= seq_step_state;
               if regAddr(12) = '0' then
                 next_seq_0_step <= '1';
-              else
-                next_seq_1_step <= '1';
               end if;
 
                                         -- sequencer stop
@@ -1470,8 +1393,6 @@ begin
               next_state <= seq_stop_state;
               if regAddr(12) = '0' then
                 next_seq_0_stop <= '1';
-              else
-                next_seq_1_stop <= '1';
               end if;
 
                                         -- enable video ADC conv shift
@@ -1479,8 +1400,6 @@ begin
               next_state <= enable_conv_shift_state;
               if regAddr(12) = '0' then
                 next_seq_0_enable_conv_shift <= '1';
-              else
-                next_seq_1_enable_conv_shift <= '1';
               end if;
 
                                         -- initialize video ADC conv shift
@@ -1488,8 +1407,6 @@ begin
               next_state <= init_conv_shift_state;
               if regAddr(12) = '0' then
                 next_seq_0_init_conv_shift <= '1';
-              else
-                next_seq_1_init_conv_shift <= '1';
               end if;
 
                                         -- indirect memory write                        
@@ -1497,8 +1414,6 @@ begin
               next_state <= enable_start_add_prog_mem_state;
               if regAddr(12) = '0' then
                 next_seq_0_start_add_prog_mem_en <= '1';
-              else
-                next_seq_1_start_add_prog_mem_en <= '1';
               end if;
               
             elsif ((regAddr >= seq_ind_func_mem_base_0) and (regAddr <= seq_ind_func_mem_high_0)) or
@@ -1507,8 +1422,6 @@ begin
               next_state <= seq_ind_func_mem_we_state;
               if regAddr(12) = '0' then
                 next_seq_0_ind_func_mem_we <= '1';
-              else
-                next_seq_1_ind_func_mem_we <= '1';
               end if;
               
             elsif ((regAddr >= seq_ind_rep_mem_base_0) and (regAddr <= seq_ind_rep_mem_high_0)) or
@@ -1517,8 +1430,6 @@ begin
               next_state <= seq_ind_rep_mem_we_state;
               if regAddr(12) = '0' then
                 next_seq_0_ind_rep_mem_we <= '1';
-              else
-                next_seq_1_ind_rep_mem_we <= '1';
               end if;
               
             elsif ((regAddr >= seq_ind_sub_add_mem_base_0) and (regAddr <= seq_ind_sub_add_mem_high_0)) or
@@ -1527,8 +1438,6 @@ begin
               next_state <= seq_ind_sub_add_mem_we_state;
               if regAddr(12) = '0' then
                 next_seq_0_ind_sub_add_mem_we <= '1';
-              else
-                next_seq_1_ind_sub_add_mem_we <= '1';
               end if;
               
             elsif ((regAddr >= seq_ind_sub_rep_mem_base_0) and (regAddr <= seq_ind_sub_rep_mem_high_0)) or
@@ -1537,8 +1446,6 @@ begin
               next_state <= seq_ind_sub_rep_mem_we_state;
               if regAddr(12) = '0' then
                 next_seq_0_ind_sub_rep_mem_we <= '1';
-              else
-                next_seq_1_ind_sub_rep_mem_we <= '1';
               end if;
 
             -- op code error reset
@@ -1546,8 +1453,6 @@ begin
               next_state <= seq_op_code_error_reset_state;
               if regAddr(12) = '0' then
                 next_seq_0_op_code_error_reset <= '1';
-              else
-                next_seq_1_op_code_error_reset <= '1';
               end if;
 
 ---------- CABAC Parameters Write
@@ -1953,8 +1858,6 @@ begin
       when seq_func_time_rd =>
         if regAddr(12) = '0' then
           next_regDataRd(15 downto 0) <= seq_0_time_mem_readbk;
-        else
-          next_regDataRd(15 downto 0) <= seq_1_time_mem_readbk;
         end if;
         next_state                   <= wait_end_cmd;
         next_regDataRd(31 downto 16) <= x"0000";
@@ -1964,8 +1867,6 @@ begin
       when seq_func_out_rd =>
         if regAddr(12) = '0' then
           next_regDataRd <= seq_0_out_mem_readbk;
-        else
-          next_regDataRd <= seq_1_out_mem_readbk;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -1974,8 +1875,6 @@ begin
       when seq_prog_mem_rd =>
         if regAddr(12) = '0' then
           next_regDataRd <= seq_0_prog_mem_readbk;
-        else
-          next_regDataRd <= seq_1_prog_mem_readbk;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -1984,8 +1883,6 @@ begin
       when enable_conv_shift_rd =>
         if regAddr(12) = '0' then
           next_regDataRd <= x"0000000" & "000" & seq_0_enable_conv_shift_in;
-        else
-          next_regDataRd <= x"0000000" & "000" & seq_1_enable_conv_shift_in;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -1994,8 +1891,6 @@ begin
       when start_add_prog_mem_rd_state =>
         if regAddr(12) = '0' then
           next_regDataRd <= x"00000" & "00" & seq_0_start_add_prog_mem_rbk;
-        else
-          next_regDataRd <= x"00000" & "00" & seq_1_start_add_prog_mem_rbk;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -2004,8 +1899,6 @@ begin
       when seq_ind_func_mem_rdbk_state =>
         if regAddr(12) = '0' then
           next_regDataRd <= x"0000000" & seq_0_ind_func_mem_rdbk;
-        else
-          next_regDataRd <= x"0000000" & seq_1_ind_func_mem_rdbk;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -2014,8 +1907,6 @@ begin
       when seq_ind_rep_mem_rdbk_state =>
         if regAddr(12) = '0' then
           next_regDataRd <= x"00" & seq_0_ind_rep_mem_rdbk;
-        else
-          next_regDataRd <= x"00" & seq_1_ind_rep_mem_rdbk;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -2024,8 +1915,6 @@ begin
       when seq_ind_sub_add_mem_rdbk_state =>
         if regAddr(12) = '0' then
           next_regDataRd <= x"00000" & "00" & seq_0_ind_sub_add_mem_rdbk;
-        else
-          next_regDataRd <= x"00000" & "00" & seq_1_ind_sub_add_mem_rdbk;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -2034,8 +1923,6 @@ begin
       when seq_ind_sub_rep_mem_rdbk_state =>
         if regAddr(12) = '0' then
           next_regDataRd <= x"0000" & seq_0_ind_sub_rep_mem_rdbk;
-        else
-          next_regDataRd <= x"0000" & seq_1_ind_sub_rep_mem_rdbk;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -2044,8 +1931,6 @@ begin
       when seq_op_code_error_rd_state =>
         if regAddr(12) = '0' then
           next_regDataRd <= "000" & seq_0_op_code_error & x"0000" & "00" & seq_0_op_code_error_add;
-        else
-          next_regDataRd <= "000" & seq_1_op_code_error & x"0000" & "00" & seq_1_op_code_error_add;
         end if;
         next_state  <= wait_end_cmd;
         next_regAck <= '1';
@@ -2159,6 +2044,31 @@ begin
         next_state     <= wait_end_cmd;
         next_regDataRd <= "0000" & x"0" & "00" & c_bias_v_undr_th & "0000" & x"0" & "00" & c_bias_dac_cmd_err;
         next_regAck    <= '1';
+
+      when ccd_1_gd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_1_bias_gd_thresh;
+      	next_regAck    <= '1';
+      when ccd_1_od_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_1_bias_od_thresh;
+      	next_regAck    <= '1';
+      when ccd_1_rd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_1_bias_rd_thresh;
+      	next_regAck    <= '1';
+      when ccd_2_gd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_2_bias_gd_thresh;
+      	next_regAck    <= '1';
+      when ccd_2_od_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_2_bias_od_thresh;
+      	next_regAck    <= '1';
+      when ccd_2_rd_thresh_read_state =>
+      	next_state     <= wait_end_cmd;
+      	next_regDataRd <= x"0000" & x"0" & ccd_2_bias_rd_thresh;
+      	next_regAck    <= '1';
 
 ---------------------- DREB voltage and current sensors --------------------------      
       -- V_HTR voltage
