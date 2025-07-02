@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Title         : Version File
--- Project       : 
+-- Project       :
 -------------------------------------------------------------------------------
--- File          : 
--- Author        : 
--- Created       : 
+-- File          :
+-- Author        :
+-- Created       :
 -------------------------------------------------------------------------------
 -- Description:
 -- Version Constant Module.
@@ -12,7 +12,7 @@
 -- Copyright (c) 2010 by SLAC National Accelerator Laboratory. All rights reserved.
 -------------------------------------------------------------------------------
 -- Modification history:
--- 
+--
 -------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
@@ -23,9 +23,9 @@ package Version is
 -------------------------------------------------------------------------------
   -- 202c2000 GREB v2 first version
 
-  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"2139200E"; -- MAKE_VERSION
+  constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"2139200F"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "GREB_v2: Vivado v2018.3 (x86_64) Built Wed Apr 30 16:20:48 PDT 2025 by jgt";
+constant BUILD_STAMP_C : string := "GREB_v2: Vivado v2018.3 (x86_64) Built Tue Jul  1 16:58:07 PDT 2025 by jgt";
 
 end Version;
 
@@ -47,4 +47,5 @@ end Version;
 -- 200A GREB Added register START command that specifies a MAIN
 -- 200B GREB Added version number to bitfile
 -- 200E GREB Added bias threshold readback and sequencer override
+-- 200F GREB Bias VUT and HV switch no longer reset by REB reset
 -------------------------------------------------------------------------------

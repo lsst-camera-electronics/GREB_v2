@@ -106,8 +106,9 @@ architecture Behavioral of dual_ad53xx_DAC_protection_top is
   signal ldac_delay_1 : std_logic;
   signal ldac_delay_2 : std_logic;
 
-  signal command_error_i   : std_logic_vector(5 downto 0);
-  signal values_under_th_i : std_logic_vector(5 downto 0);
+  signal command_error_i    : std_logic_vector(5 downto 0);
+  signal values_under_th_i  : std_logic_vector(5 downto 0);
+  signal first_reset_done_i : std_logic;
 
   constant GD_add : std_logic_vector(3 downto 0) := x"0";
   constant OD_add : std_logic_vector(3 downto 0) := x"5";
@@ -154,7 +155,11 @@ begin
         start_write_delay_1 <= '0';
         d_to_slave_delay_1  <= (others => '0');
         command_error_i     <= (others => '0');
-        values_under_th_i   <= (others => '1');
+        if first_reset_done_i = '0' then
+            -- First reset (power-up) initialization
+            first_reset_done_i <= '1';   -- Mark that first reset has occurred
+	        values_under_th_i  <= (others => '1');
+        end if;
       else
         if start_write = '1' and d_to_slave(15 downto 12) = GD_add then
           if (d_to_slave(16) = '0' and d_to_slave(11 downto 0) < GD_0_th_int) or 
