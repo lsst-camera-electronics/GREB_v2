@@ -1,8 +1,8 @@
-# temporary emacs files
-*~
-
 # dumb mac files
 .DS_Store
+
+# temporary emacs files
+*~
 
 #vivado files
 *.jou
@@ -11,8 +11,10 @@
 #build directory
 /build
 
-#images compressed
+#bitfiles
 *.mcs
 *.bit
 *.mcs.gz
 !*multiboot.mcs.gz
+targets/*/images/*-dirty*
+targets/*/build.info
