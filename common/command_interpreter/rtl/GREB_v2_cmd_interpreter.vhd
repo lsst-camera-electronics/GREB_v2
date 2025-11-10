@@ -18,7 +18,8 @@ use lsst_reb.basic_elements_pkg.all;
 entity GREB_v2_cmd_interpeter is
   generic (
     VERSION_G        : RebVersionType;
-    NUM_SEQUENCERS_G : integer
+    NUM_SEQUENCERS_G : integer;
+    CLK_PERIOD_G     : real
   );
   port (
     reset : in    std_logic;
@@ -184,7 +185,7 @@ entity GREB_v2_cmd_interpeter is
     T1_reb_gr3_error : in    std_logic;
 
     -- ASPIC temp and voltage monitor
-    aspic_t_v_data    : in    array432;
+    aspic_t_v_data    : in    Slv16Array(7 downto 0);
     aspic_t_v_busy    : in    std_logic;
     aspic_t_v_start_r : out   std_logic;
 
@@ -261,7 +262,7 @@ architecture Behavioral of GREB_v2_cmd_interpeter is
 
     -- BRS states
     schema, hdl_version, SCI_ID, reserved_1, time_base_read_lsw, time_base_read_MSW,
-    reserved_2, reserved_3, state_busy, trigger_time_SB_lsw, trigger_time_SB_MSW,
+    reserved_2, reserved_3, sys_clock_rate, state_busy, trigger_time_SB_lsw, trigger_time_SB_MSW,
     trigger_time_TB_lsw, trigger_time_TB_MSW, trigger_time_seq_lsw, trigger_time_seq_MSW,
     trigger_time_V_I_lsw, trigger_time_V_I_MSW, trigger_time_pcb_t_lsw, trigger_time_pcb_t_MSW,
 
@@ -324,8 +325,10 @@ architecture Behavioral of GREB_v2_cmd_interpeter is
     REB_T1_gr3_state,
 
     -- ASPIC temp and voltage monitor
-    aspic_t_v_read_t_top_state, aspic_t_v_read_t_bot_state,
-    aspic_t_v_read_2_5_state, aspic_t_v_read_5_state,
+    aspic_t_v_gr1_read_t_top_state, aspic_t_v_gr1_read_t_bot_state,
+    aspic_t_v_gr1_read_2_5_state, aspic_t_v_gr1_read_5_state,
+    aspic_t_v_gr2_read_t_top_state, aspic_t_v_gr2_read_t_bot_state,
+    aspic_t_v_gr2_read_2_5_state, aspic_t_v_gr2_read_5_state,
     aspic_t_v_start_r_state, aspic_t_v_start_r_state_1,
 
     -- CCD temperature sensor
@@ -842,6 +845,10 @@ begin
             elsif (regAddr = read_reserved_3_cmd) then
               next_state <= reserved_3;
 
+            -- sys_clock_rate
+            elsif (regAddr = sys_clock_rate_cmd) then
+              next_state <= sys_clock_rate;
+
             -- read busy state
             elsif (regAddr = read_state_busy_cmd) then
               next_state <= state_busy;
@@ -1091,14 +1098,23 @@ begin
               next_state <= REB_T1_gr3_state;
 
             -------- ASPIC temp and voltage monitor
-            elsif (regAddr = aspic_t_v_read_t_top_cmd) then
-              next_state <= aspic_t_v_read_t_top_state;
-            elsif (regAddr = aspic_t_v_read_t_bot_cmd) then
-              next_state <= aspic_t_v_read_t_bot_state;
-            elsif (regAddr = aspic_t_v_read_2_5_cmd) then
-              next_state <= aspic_t_v_read_2_5_state;
-            elsif (regAddr = aspic_t_v_read_5_cmd) then
-              next_state <= aspic_t_v_read_5_state;
+            elsif (regAddr = aspic_t_v_gr1_read_t_top_cmd) then
+              next_state <= aspic_t_v_gr1_read_t_top_state;
+            elsif (regAddr = aspic_t_v_gr1_read_t_bot_cmd) then
+              next_state <= aspic_t_v_gr1_read_t_bot_state;
+            elsif (regAddr = aspic_t_v_gr1_read_2_5_cmd) then
+              next_state <= aspic_t_v_gr1_read_2_5_state;
+            elsif (regAddr = aspic_t_v_gr1_read_5_cmd) then
+              next_state <= aspic_t_v_gr1_read_5_state;
+
+            elsif (regAddr = aspic_t_v_gr2_read_t_top_cmd) then
+              next_state <= aspic_t_v_gr2_read_t_top_state;
+            elsif (regAddr = aspic_t_v_gr2_read_t_bot_cmd) then
+              next_state <= aspic_t_v_gr2_read_t_bot_state;
+            elsif (regAddr = aspic_t_v_gr2_read_2_5_cmd) then
+              next_state <= aspic_t_v_gr2_read_2_5_state;
+            elsif (regAddr = aspic_t_v_gr2_read_5_cmd) then
+              next_state <= aspic_t_v_gr2_read_5_state;
 
             --------CCD temeprature read
             elsif (regAddr = ccd_temp_read_cmd) then
@@ -1559,6 +1575,13 @@ begin
         next_state     <= wait_end_cmd;
         next_regAck    <= '1';
         next_regDataRd <= busy_bus;
+
+      -- sys_clock_rate
+      when sys_clock_rate =>
+
+        next_state     <= wait_end_cmd;
+        next_regAck    <= '1';
+        next_regDataRd <= std_logic_vector(to_unsigned(integer(CLK_PERIOD_G*1.0E12),32));
 
       -- TRIGGER TIME READ SB lsw  (addA)
       when trigger_time_SB_lsw =>
@@ -2218,28 +2241,52 @@ begin
           next_state <= ack_del_1;
         end if;
 
-      when aspic_t_v_read_t_top_state =>
+      when aspic_t_v_gr1_read_t_top_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= aspic_t_v_data(0);
+        next_regDataRd <= x"0000" & aspic_t_v_data(0);
         next_regAck    <= '1';
 
-      when aspic_t_v_read_t_bot_state =>
+      when aspic_t_v_gr1_read_t_bot_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= aspic_t_v_data(1);
+        next_regDataRd <= x"0000" & aspic_t_v_data(1);
         next_regAck    <= '1';
 
-      when aspic_t_v_read_2_5_state =>
+      when aspic_t_v_gr1_read_2_5_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= aspic_t_v_data(2);
+        next_regDataRd <= x"0000" & aspic_t_v_data(2);
         next_regAck    <= '1';
 
-      when aspic_t_v_read_5_state =>
+      when aspic_t_v_gr1_read_5_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= aspic_t_v_data(3);
+        next_regDataRd <= x"0000" & aspic_t_v_data(3);
+        next_regAck    <= '1';
+
+      when aspic_t_v_gr2_read_t_top_state =>
+
+        next_state     <= wait_end_cmd;
+        next_regDataRd <= x"0000" & aspic_t_v_data(4);
+        next_regAck    <= '1';
+
+      when aspic_t_v_gr2_read_t_bot_state =>
+
+        next_state     <= wait_end_cmd;
+        next_regDataRd <= x"0000" & aspic_t_v_data(5);
+        next_regAck    <= '1';
+
+      when aspic_t_v_gr2_read_2_5_state =>
+
+        next_state     <= wait_end_cmd;
+        next_regDataRd <= x"0000" & aspic_t_v_data(6);
+        next_regAck    <= '1';
+
+      when aspic_t_v_gr2_read_5_state =>
+
+        next_state     <= wait_end_cmd;
+        next_regDataRd <= x"0000" & aspic_t_v_data(7);
         next_regAck    <= '1';
 
       ---------------------- CCD Temperature sensor --------------------------

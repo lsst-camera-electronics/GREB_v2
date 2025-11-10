@@ -35,6 +35,8 @@ package GREB_v2_commands_package is
 
   constant interrupt_mask_cmd : std_logic_vector(23 downto 0) := x"000017";
 
+  constant sys_clock_rate_cmd : std_logic_vector(23 downto 0) := x"000020";
+
   -- Bitstream Remote Update
   constant ru_start_cmd              : std_logic_vector(23 downto 0) := x"000100";
   constant ru_bitstream_we_cmd       : std_logic_vector(23 downto 0) := x"000101";
@@ -165,10 +167,14 @@ package GREB_v2_commands_package is
 
   ---------- ASPIC temp and voltage monitor
   constant aspic_t_v_start_r_cmd    : std_logic_vector(23 downto 0) := x"600100";
-  constant aspic_t_v_read_t_top_cmd : std_logic_vector(23 downto 0) := x"600101";
-  constant aspic_t_v_read_t_bot_cmd : std_logic_vector(23 downto 0) := x"600102";
-  constant aspic_t_v_read_2_5_cmd   : std_logic_vector(23 downto 0) := x"600103";
-  constant aspic_t_v_read_5_cmd     : std_logic_vector(23 downto 0) := x"600104";
+  constant aspic_t_v_gr1_read_t_top_cmd : std_logic_vector(23 downto 0) := x"600101";
+  constant aspic_t_v_gr1_read_t_bot_cmd : std_logic_vector(23 downto 0) := x"600102";
+  constant aspic_t_v_gr1_read_2_5_cmd   : std_logic_vector(23 downto 0) := x"600103";
+  constant aspic_t_v_gr1_read_5_cmd     : std_logic_vector(23 downto 0) := x"600104";
+  constant aspic_t_v_gr2_read_t_top_cmd : std_logic_vector(23 downto 0) := x"600105";
+  constant aspic_t_v_gr2_read_t_bot_cmd : std_logic_vector(23 downto 0) := x"600106";
+  constant aspic_t_v_gr2_read_2_5_cmd   : std_logic_vector(23 downto 0) := x"600107";
+  constant aspic_t_v_gr2_read_5_cmd     : std_logic_vector(23 downto 0) := x"600108";
 
   ---------- CCD temperature sensor
   constant ccd_temp_read_cmd        : std_logic_vector(23 downto 0) := x"700001";

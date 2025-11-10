@@ -163,6 +163,7 @@ architecture Behavioral of GREB_v2_2_seq is
 
   constant TARGET_CONFIG : RebConfigType := (
     numSequencers => 2,
+    sysClkPer     => 10.0E-9,
     gdAddr        => x"0",
     odAddr        => x"5",
     rdAddr        => x"1",
@@ -175,7 +176,7 @@ architecture Behavioral of GREB_v2_2_seq is
   constant VERSION : RebVersionType := (
     schema        => x"00000001",
     board_type    => x"2",
-    vhdl_version  => x"2110",
+    vhdl_version  => x"2111",
     reserved_1    => x"00000000",
     reserved_2    => x"00000000",
     reserved_3    => x"00000000"

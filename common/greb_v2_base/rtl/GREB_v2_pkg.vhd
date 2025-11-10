@@ -18,18 +18,9 @@ package GREB_v2_pkg is
     reserved_3   : std_logic_vector(31 downto 0);
   end record RebVersionType;
 
-  -- this will get removed
-  constant GREB_VERSION_C : RebVersionType := (
-    schema        => x"00000001",
-    board_type    => x"2",
-    vhdl_version  => x"2110",
-    reserved_1    => x"00000000",
-    reserved_2    => x"00000000",
-    reserved_3    => x"00000000"
-  );
-
   type RebConfigType is record
     numSequencers : integer range 1 to NUM_SENSORS_C;
+    sysClkPer     : real;
     gdAddr        : std_logic_vector(3 downto 0);
     odAddr        : std_logic_vector(3 downto 0);
     rdAddr        : std_logic_vector(3 downto 0);
@@ -40,13 +31,14 @@ package GREB_v2_pkg is
 
   constant GREB_CONFIG_DEFAULT_C : RebConfigType := (
     numSequencers => 1,
-    gdAddr   => x"0",
-    odAddr   => x"5",
-    rdAddr   => x"1",
-    gdThresh => (1138, 1138),
-    odThresh => (2275, 2275),
-    rdThresh => (1632, 1632)
-    --    Sensor(   0,    1)
+    sysClkPer     => 10.0E-9, -- 100MHz=10ns, 156.25=6.4ns
+    gdAddr        => x"0",
+    odAddr        => x"5",
+    rdAddr        => x"1",
+    gdThresh      => (1138, 1138),
+    odThresh      => (2275, 2275),
+    rdThresh      => (1632, 1632)
+    --         Sensor(   0,    1)
   );
 
 end package GREB_v2_pkg;

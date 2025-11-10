@@ -2,8 +2,8 @@
 ### Pin Assignment ###
 
 ## pgp reference clock
-set_property PACKAGE_PIN F6 [get_ports {PgpRefClk_P}]
-set_property PACKAGE_PIN F5 [get_ports {PgpRefClk_M}]
+set_property PACKAGE_PIN F6 [get_ports PgpRefClk_P]
+set_property PACKAGE_PIN F5 [get_ports PgpRefClk_M]
 
 
 ## PGP serial com lines (Bank 116)
@@ -152,8 +152,8 @@ set_property PACKAGE_PIN H18 [get_ports {ASPIC_spi_reset_ccd[1]}]
 set_property PACKAGE_PIN H17 [get_ports {ASPIC_nap_ccd[1]}]
 
 #(Bank15)
-set_property PACKAGE_PIN J19 [get_ports {backbias_clamp}]
-set_property PACKAGE_PIN L19 [get_ports {backbias_ssbe}]
+set_property PACKAGE_PIN J19 [get_ports backbias_clamp]
+set_property PACKAGE_PIN L19 [get_ports backbias_ssbe]
 
 #(Bank32)
 set_property PACKAGE_PIN AB17 [get_ports {pulse_ccd_p[0]}]
@@ -162,13 +162,13 @@ set_property PACKAGE_PIN AB12 [get_ports {pulse_ccd_p[1]}]
 set_property PACKAGE_PIN AC12 [get_ports {pulse_ccd_n[1]}]
 
 # DREB V & I sensors (Bank 14)
-set_property PACKAGE_PIN G24 [get_ports {LTC2945_SCL}]
-set_property PACKAGE_PIN F24 [get_ports {LTC2945_SDA}]
+set_property PACKAGE_PIN G24 [get_ports LTC2945_SCL]
+set_property PACKAGE_PIN F24 [get_ports LTC2945_SDA]
 
 #Temperature probes
 # dreb temp sens (Bank 14)
-set_property PACKAGE_PIN G26 [get_ports {DREB_temp_sda}]
-set_property PACKAGE_PIN G25 [get_ports {DREB_temp_scl}]
+set_property PACKAGE_PIN G26 [get_ports DREB_temp_sda]
+set_property PACKAGE_PIN G25 [get_ports DREB_temp_scl]
 # ccd1 PCB temp probes (Bank 13)
 set_property PACKAGE_PIN R20 [get_ports {Temp_adc_scl_ccd[0]}]
 set_property PACKAGE_PIN T22 [get_ports {Temp_adc_sda_ccd[0]}]
@@ -177,35 +177,35 @@ set_property PACKAGE_PIN K18 [get_ports {Temp_adc_scl_ccd[1]}]
 set_property PACKAGE_PIN M16 [get_ports {Temp_adc_sda_ccd[1]}]
 
 ##CCD temperatures (Bank 14)
-set_property PACKAGE_PIN B26 [get_ports {csb_24ADC}]
-set_property PACKAGE_PIN A23 [get_ports {sclk_24ADC}]
-set_property PACKAGE_PIN A24 [get_ports {din_24ADC}]
-set_property PACKAGE_PIN D26 [get_ports {dout_24ADC}]
+set_property PACKAGE_PIN B26 [get_ports csb_24ADC]
+set_property PACKAGE_PIN A23 [get_ports sclk_24ADC]
+set_property PACKAGE_PIN A24 [get_ports din_24ADC]
+set_property PACKAGE_PIN D26 [get_ports dout_24ADC]
 
 # ASPICs temp and voltage ADC
-set_property PACKAGE_PIN H26 [get_ports {aspic_t_v_miso}]
-set_property PACKAGE_PIN C26 [get_ports {aspic_t_v_mosi}]
+set_property PACKAGE_PIN H26 [get_ports aspic_t_v_miso]
+set_property PACKAGE_PIN C26 [get_ports aspic_t_v_mosi]
 set_property PACKAGE_PIN AE22 [get_ports {aspic_t_v_ss_ccd[0]}]
 set_property PACKAGE_PIN AF22 [get_ports {aspic_t_v_ss_ccd[1]}]
-set_property PACKAGE_PIN J24 [get_ports {aspic_t_v_sclk}]
+set_property PACKAGE_PIN J24 [get_ports aspic_t_v_sclk]
 
 ##### DAC ####
 ##clock rails DAC (Bank 14)
-set_property PACKAGE_PIN E21 [get_ports {ldac_RAILS}]
-set_property PACKAGE_PIN E22 [get_ports {din_RAILS}]
-set_property PACKAGE_PIN B21 [get_ports {sclk_RAILS}]
+set_property PACKAGE_PIN E21 [get_ports ldac_RAILS]
+set_property PACKAGE_PIN E22 [get_ports din_RAILS]
+set_property PACKAGE_PIN B21 [get_ports sclk_RAILS]
 set_property PACKAGE_PIN C21 [get_ports {sync_RAILS_dac[0]}]
 set_property PACKAGE_PIN D23 [get_ports {sync_RAILS_dac[1]}]
 
 ##clock rails DAC (Bank 14)
 set_property PACKAGE_PIN J25 [get_ports {sync_C_BIAS[0]}]
 set_property PACKAGE_PIN L22 [get_ports {sync_C_BIAS[1]}]
-set_property PACKAGE_PIN J23 [get_ports {din_C_BIAS}]
-set_property PACKAGE_PIN L23 [get_ports {ldac_C_BIAS}]
-set_property PACKAGE_PIN K23 [get_ports {sclk_C_BIAS}]
+set_property PACKAGE_PIN J23 [get_ports din_C_BIAS]
+set_property PACKAGE_PIN L23 [get_ports ldac_C_BIAS]
+set_property PACKAGE_PIN K23 [get_ports sclk_C_BIAS]
 
 ### max 11056 bias slow adc
-set_property PACKAGE_PIN Y26 [get_ports {ck_adc_EOC}]
+set_property PACKAGE_PIN Y26 [get_ports ck_adc_EOC]
 set_property PACKAGE_PIN T18 [get_ports {ccd_adc_EOC[0]}]
 set_property PACKAGE_PIN L18 [get_ports {ccd_adc_EOC[1]}]
 set_property PACKAGE_PIN W23 [get_ports {slow_adc_data_from_adc_dcr[0]}]
@@ -225,25 +225,25 @@ set_property PACKAGE_PIN V22 [get_ports {slow_adc_data_from_adc[13]}]
 set_property PACKAGE_PIN U22 [get_ports {slow_adc_data_from_adc[14]}]
 set_property PACKAGE_PIN U21 [get_ports {slow_adc_data_from_adc[15]}]
 
-set_property PACKAGE_PIN AC26 [get_ports {ck_adc_CS}]
+set_property PACKAGE_PIN AC26 [get_ports ck_adc_CS]
 set_property PACKAGE_PIN U19 [get_ports {ccd_adc_CS[0]}]
 set_property PACKAGE_PIN K17 [get_ports {ccd_adc_CS[1]}]
-set_property PACKAGE_PIN AB26 [get_ports {slow_adc_RD}]
-set_property PACKAGE_PIN W24 [get_ports {slow_adc_WR}]
-set_property PACKAGE_PIN Y25 [get_ports {ck_adc_CONVST}]
+set_property PACKAGE_PIN AB26 [get_ports slow_adc_RD]
+set_property PACKAGE_PIN W24 [get_ports slow_adc_WR]
+set_property PACKAGE_PIN Y25 [get_ports ck_adc_CONVST]
 set_property PACKAGE_PIN U20 [get_ports {ccd_adc_CONVST[0]}]
 set_property PACKAGE_PIN M17 [get_ports {ccd_adc_CONVST[1]}]
-set_property PACKAGE_PIN AA23 [get_ports {ck_adc_SHDN}]
+set_property PACKAGE_PIN AA23 [get_ports ck_adc_SHDN]
 set_property PACKAGE_PIN T19 [get_ports {ccd_adc_SHDN[0]}]
 set_property PACKAGE_PIN L17 [get_ports {ccd_adc_SHDN[1]}]
 
 #### Remote Update
 #Bank 14
-set_property PACKAGE_PIN C23 [get_ports {ru_outSpiCsB}]
-set_property PACKAGE_PIN B24 [get_ports {ru_outSpiMosi}]
-set_property PACKAGE_PIN A25 [get_ports {ru_inSpiMiso}]
-set_property PACKAGE_PIN B22 [get_ports {ru_outSpiWpB}]
-set_property PACKAGE_PIN A22 [get_ports {ru_outSpiHoldB}]
+set_property PACKAGE_PIN C23 [get_ports ru_outSpiCsB]
+set_property PACKAGE_PIN B24 [get_ports ru_outSpiMosi]
+set_property PACKAGE_PIN A25 [get_ports ru_inSpiMiso]
+set_property PACKAGE_PIN B22 [get_ports ru_outSpiWpB]
+set_property PACKAGE_PIN A22 [get_ports ru_outSpiHoldB]
 
 ### misc signals ###
 
@@ -382,6 +382,14 @@ set_property BITSTREAM.CONFIG.TIMER_CFG 32'h4007A120 [current_design]
 
 set_property CFGBVS VCCO [current_design]
 set_property CONFIG_VOLTAGE 3.3 [current_design]
+
+
+
+
+
+
+
+
 
 
 

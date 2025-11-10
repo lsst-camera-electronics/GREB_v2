@@ -18,10 +18,11 @@
 # -- 200E GREB Added bias threshold readback and sequencer override
 # -- 200F GREB Bias VUT and HV switch no longer reset by REB reset
 # -- 2010 Nominally same as version F, but refactored to use new build system and modern Vivado
+# -- 2011 Moving to the parameterized system clock to enable "natural frequency" firmware
 # -------------------------------------------------------------------------------
 
 # Define Firmware Version Number (and don't forget to change the register values! :facepalm:)
-export PRJ_VERSION = 0x213A2010
+export PRJ_VERSION = 0x213A2011
 
 export GIT_BYPASS=0
 export OVERRIDE_SUBMODULE_LOCKS=0
