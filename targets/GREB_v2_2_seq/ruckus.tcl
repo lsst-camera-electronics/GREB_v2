@@ -9,3 +9,4 @@ loadRuckusTcl $::env(PROJ_DIR)/../../common
 
 # Load local Source Code and constraints
 loadSource      -path "$::DIR_PATH/hdl/GREB_v2_2_seq.vhd"
+loadConstraints -path $::env(PROJ_DIR)/../../common/greb_v2_base/rtl/GREB_v2_time.xdc

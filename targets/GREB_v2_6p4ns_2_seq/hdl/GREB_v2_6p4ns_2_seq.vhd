@@ -10,7 +10,7 @@ use lsst_reb.reb_config_pkg.all;
 library common;
 use common.GREB_v2_pkg.all;
 
-entity GREB_v2_2_seq is
+entity GREB_v2_6p4ns_2_seq is
   generic (
     BUILD_INFO_G : BuildInfoType
   );
@@ -160,13 +160,13 @@ entity GREB_v2_2_seq is
     -- DREB serial number
     reb_sn_onewire : inout std_logic
   );
-end entity GREB_v2_2_seq;
+end entity GREB_v2_6p4ns_2_seq;
 
-architecture Behavioral of GREB_v2_2_seq is
+architecture Behavioral of GREB_v2_6p4ns_2_seq is
 
   constant TARGET_CONFIG : RebConfigType := (
     numSequencers => 2,
-    sysClkPer     => 10.0E-9,
+    sysClkPer     => 6.4E-9,
     gdAddr        => x"0",
     odAddr        => x"5",
     rdAddr        => x"1",

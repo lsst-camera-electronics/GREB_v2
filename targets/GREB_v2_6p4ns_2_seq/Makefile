@@ -23,7 +23,7 @@
 # -- 2110 Nominally same as version F, but refactored to use new build system and modern Vivado
 # -- 2111 Moving to the parameterized system clock to enable "natural frequency" firmware
 # -- 2112 Add 6.4ns target
-# -------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Define Firmware Version Number (and don't forget to change the register values! :facepalm:)
 export PRJ_VERSION = 0x213B2112

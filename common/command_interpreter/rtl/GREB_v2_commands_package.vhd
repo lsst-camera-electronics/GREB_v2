@@ -6,6 +6,8 @@ use surf.StdRtlPkg.all;
 
 package GREB_v2_commands_package is
 
+  constant REG_SCHEMA      : std_logic_vector(31 downto 0) := x"00000001";
+
   -- Base Register Set
   constant read_schema_cmd              : std_logic_vector(23 downto 0) := x"000000";
   constant read_hdl_version_cmd         : std_logic_vector(23 downto 0) := x"000001";
@@ -28,7 +30,7 @@ package GREB_v2_commands_package is
   constant read_trig_time_pcb_t_lsw_cmd : std_logic_vector(23 downto 0) := x"000012";
   constant read_trig_time_pcb_t_MSW_cmd : std_logic_vector(23 downto 0) := x"000013";
 
-  constant read_v_ok_cmd : std_logic_vector(23 downto 0) := x"000100";
+  constant read_v_ok_cmd : std_logic_vector(23 downto 0) := x"000100"; -- ????
 
   constant sync_cmd_delay_cmd : std_logic_vector(23 downto 0) := x"000015";
   constant sync_cmd_mask_cmd  : std_logic_vector(23 downto 0) := x"000016";
@@ -167,14 +169,10 @@ package GREB_v2_commands_package is
 
   ---------- ASPIC temp and voltage monitor
   constant aspic_t_v_start_r_cmd    : std_logic_vector(23 downto 0) := x"600100";
-  constant aspic_t_v_gr1_read_t_top_cmd : std_logic_vector(23 downto 0) := x"600101";
-  constant aspic_t_v_gr1_read_t_bot_cmd : std_logic_vector(23 downto 0) := x"600102";
-  constant aspic_t_v_gr1_read_2_5_cmd   : std_logic_vector(23 downto 0) := x"600103";
-  constant aspic_t_v_gr1_read_5_cmd     : std_logic_vector(23 downto 0) := x"600104";
-  constant aspic_t_v_gr2_read_t_top_cmd : std_logic_vector(23 downto 0) := x"600105";
-  constant aspic_t_v_gr2_read_t_bot_cmd : std_logic_vector(23 downto 0) := x"600106";
-  constant aspic_t_v_gr2_read_2_5_cmd   : std_logic_vector(23 downto 0) := x"600107";
-  constant aspic_t_v_gr2_read_5_cmd     : std_logic_vector(23 downto 0) := x"600108";
+  constant aspic_t_v_read_t_top_cmd : std_logic_vector(23 downto 0) := x"600101";
+  constant aspic_t_v_read_t_bot_cmd : std_logic_vector(23 downto 0) := x"600102";
+  constant aspic_t_v_read_2_5_cmd   : std_logic_vector(23 downto 0) := x"600103";
+  constant aspic_t_v_read_5_cmd     : std_logic_vector(23 downto 0) := x"600104";
 
   ---------- CCD temperature sensor
   constant ccd_temp_read_cmd        : std_logic_vector(23 downto 0) := x"700001";

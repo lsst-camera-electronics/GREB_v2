@@ -4,6 +4,9 @@ use IEEE.STD_LOGIC_1164.all;
 library surf;
 use surf.StdRtlPkg.all;
 
+library lsst_reb;
+use lsst_reb.reb_config_pkg.all;
+
 library common;
 use common.GREB_v2_pkg.all;
 
@@ -167,16 +170,10 @@ architecture Behavioral of GREB_v2 is
     gdAddr        => x"0",
     odAddr        => x"5",
     rdAddr        => x"1",
-    gdThresh      => (1138, 1138),
-    odThresh      => (2275, 2275),
-    rdThresh      => (1632, 1632)
-    --         Sensor(   0,    1)
-  );
-
-  constant VERSION : RebVersionType := (
-    schema        => x"00000001",
-    board_type    => x"2",
-    vhdl_version  => x"2011",
+    gdThresh      => (1138, 1138, 0),
+    odThresh      => (2275, 2275, 0),
+    rdThresh      => (1632, 1632, 0),
+    --         Sensor(   0,    1, 2)
     reserved_1    => x"00000000",
     reserved_2    => x"00000000",
     reserved_3    => x"00000000"
@@ -187,7 +184,6 @@ begin
   U_GREB_v2 : entity common.GREB_v2_base
     generic map (
       BUILD_INFO_G => BUILD_INFO_G,
-      VERSION_G    => VERSION,
       CONFIG_G     => TARGET_CONFIG
     )
     port map (

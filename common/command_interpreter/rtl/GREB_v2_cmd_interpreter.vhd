@@ -14,12 +14,15 @@ use lsst_sci.LsstSciPackage.all;
 
 library lsst_reb;
 use lsst_reb.basic_elements_pkg.all;
+use lsst_reb.reb_config_pkg.all;
 
 entity GREB_v2_cmd_interpeter is
   generic (
-    VERSION_G        : RebVersionType;
-    NUM_SEQUENCERS_G : integer;
-    CLK_PERIOD_G     : real
+    --VERSION_G        : RebVersionType;
+    VERSION_G : std_logic_vector(31 downto 0);
+    CONFIG_G  : RebConfigType
+    --NUM_SEQUENCERS_G : integer;
+    --CLK_PERIOD_G     : real
   );
   port (
     reset : in    std_logic;
@@ -79,30 +82,30 @@ entity GREB_v2_cmd_interpeter is
     seq_override_rd    : in    Slv32Array(1 downto 0);
 
     -- Sequencer
-    seq_time_mem_readbk      : in    Slv16Array(NUM_SEQUENCERS_G-1 downto 0);       -- time memory read bus
-    seq_out_mem_readbk       : in    Slv32Array(NUM_SEQUENCERS_G-1 downto 0);       -- time memory read bus
-    seq_prog_mem_readbk      : in    Slv32Array(NUM_SEQUENCERS_G-1 downto 0);       -- sequencer program memory read
-    seq_time_mem_w_en        : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal enables the time memory write
-    seq_out_mem_w_en         : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal enables the output memory write
-    seq_prog_mem_w_en        : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal enables the program memory write
-    seq_step                 : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
-    seq_stop                 : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
-    enable_conv_shift_in     : in    std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-    enable_conv_shift        : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-    init_conv_shift          : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal initialize the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
-    start_add_prog_mem_en    : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-    start_add_prog_mem_rbk   : in    Slv10Array(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_func_mem_we      : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_func_mem_rdbk    : in    Slv4Array(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_rep_mem_we       : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_rep_mem_rdbk     : in    Slv24Array(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_sub_add_mem_we   : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_sub_add_mem_rdbk : in    Slv10Array(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_sub_rep_mem_we   : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-    seq_ind_sub_rep_mem_rdbk : in    Slv16Array(NUM_SEQUENCERS_G-1 downto 0);
-    seq_op_code_error        : in    std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-    seq_op_code_error_add    : in    Slv10Array(NUM_SEQUENCERS_G-1 downto 0);
-    seq_op_code_error_reset  : out   std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
+    seq_time_mem_readbk      : in    Slv16Array(CONFIG_G.numSequencers-1 downto 0);       -- time memory read bus
+    seq_out_mem_readbk       : in    Slv32Array(CONFIG_G.numSequencers-1 downto 0);       -- time memory read bus
+    seq_prog_mem_readbk      : in    Slv32Array(CONFIG_G.numSequencers-1 downto 0);       -- sequencer program memory read
+    seq_time_mem_w_en        : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal enables the time memory write
+    seq_out_mem_w_en         : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal enables the output memory write
+    seq_prog_mem_w_en        : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal enables the program memory write
+    seq_step                 : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
+    seq_stop                 : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
+    enable_conv_shift_in     : in    std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
+    enable_conv_shift        : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal enable the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
+    init_conv_shift          : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal initialize the adc_conv shifter (the adc_conv is shifted 1 clk every time is activated)
+    start_add_prog_mem_en    : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+    start_add_prog_mem_rbk   : in    Slv10Array(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_func_mem_we      : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_func_mem_rdbk    : in    Slv4Array(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_rep_mem_we       : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_rep_mem_rdbk     : in    Slv24Array(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_sub_add_mem_we   : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_sub_add_mem_rdbk : in    Slv10Array(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_sub_rep_mem_we   : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+    seq_ind_sub_rep_mem_rdbk : in    Slv16Array(CONFIG_G.numSequencers-1 downto 0);
+    seq_op_code_error        : in    std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+    seq_op_code_error_add    : in    Slv10Array(CONFIG_G.numSequencers-1 downto 0);
+    seq_op_code_error_reset  : out   std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
 
     -- ASPIC
     aspic_config_r_ccd_1 : in    std_logic_vector(15 downto 0);
@@ -185,7 +188,7 @@ entity GREB_v2_cmd_interpeter is
     T1_reb_gr3_error : in    std_logic;
 
     -- ASPIC temp and voltage monitor
-    aspic_t_v_data    : in    Slv16Array(7 downto 0);
+    aspic_t_v_data    : in    Slv32Array(3 downto 0);
     aspic_t_v_busy    : in    std_logic;
     aspic_t_v_start_r : out   std_logic;
 
@@ -250,7 +253,8 @@ end entity GREB_v2_cmd_interpeter;
 
 architecture Behavioral of GREB_v2_cmd_interpeter is
 
-  constant ver : RebVersionType := VERSION_G;
+  constant fwVersion : std_logic_vector(31 downto 0) := VERSION_G;
+  constant cfg       : RebConfigType    := CONFIG_G;
 
   function sequencer_index(addr : std_logic_vector(1 downto 0)) return integer is
   begin
@@ -325,10 +329,8 @@ architecture Behavioral of GREB_v2_cmd_interpeter is
     REB_T1_gr3_state,
 
     -- ASPIC temp and voltage monitor
-    aspic_t_v_gr1_read_t_top_state, aspic_t_v_gr1_read_t_bot_state,
-    aspic_t_v_gr1_read_2_5_state, aspic_t_v_gr1_read_5_state,
-    aspic_t_v_gr2_read_t_top_state, aspic_t_v_gr2_read_t_bot_state,
-    aspic_t_v_gr2_read_2_5_state, aspic_t_v_gr2_read_5_state,
+    aspic_t_v_read_t_top_state, aspic_t_v_read_t_bot_state,
+    aspic_t_v_read_2_5_state, aspic_t_v_read_5_state,
     aspic_t_v_start_r_state, aspic_t_v_start_r_state_1,
 
     -- CCD temperature sensor
@@ -416,19 +418,19 @@ architecture Behavioral of GREB_v2_cmd_interpeter is
   signal next_seq_override_wr : std_logic_vector(1 downto 0);
 
   -- Sequencer
-  signal next_seq_time_mem_w_en       : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- function outupt register enable flag
-  signal next_seq_out_mem_w_en        : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- function time register enable flag
-  signal next_seq_prog_mem_w_en       : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- sequencer program memory enable flag
-  signal next_seq_step                : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
-  signal next_seq_stop                : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0); -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL and stop all function)
-  signal next_enable_conv_shift       : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-  signal next_init_conv_shift         : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-  signal next_start_add_prog_mem_en   : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-  signal next_seq_ind_func_mem_we     : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-  signal next_seq_ind_rep_mem_we      : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-  signal next_seq_ind_sub_add_mem_we  : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-  signal next_seq_ind_sub_rep_mem_we  : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
-  signal next_seq_op_code_error_reset : std_logic_vector(NUM_SEQUENCERS_G-1 downto 0);
+  signal next_seq_time_mem_w_en       : std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- function outupt register enable flag
+  signal next_seq_out_mem_w_en        : std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- function time register enable flag
+  signal next_seq_prog_mem_w_en       : std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- sequencer program memory enable flag
+  signal next_seq_step                : std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal send the STEP to the sequencer. Valid on in infinite loop (the machine jump out from IL to next function)
+  signal next_seq_stop                : std_logic_vector(CONFIG_G.numSequencers-1 downto 0); -- this signal send the STOP to the sequencer. Valid on in infinite loop (the machine jump out from IL and stop all function)
+  signal next_enable_conv_shift       : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+  signal next_init_conv_shift         : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+  signal next_start_add_prog_mem_en   : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+  signal next_seq_ind_func_mem_we     : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+  signal next_seq_ind_rep_mem_we      : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+  signal next_seq_ind_sub_add_mem_we  : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+  signal next_seq_ind_sub_rep_mem_we  : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
+  signal next_seq_op_code_error_reset : std_logic_vector(CONFIG_G.numSequencers-1 downto 0);
 
   -- ASPIC
   signal next_aspic_start_trans : std_logic;
@@ -1098,23 +1100,14 @@ begin
               next_state <= REB_T1_gr3_state;
 
             -------- ASPIC temp and voltage monitor
-            elsif (regAddr = aspic_t_v_gr1_read_t_top_cmd) then
-              next_state <= aspic_t_v_gr1_read_t_top_state;
-            elsif (regAddr = aspic_t_v_gr1_read_t_bot_cmd) then
-              next_state <= aspic_t_v_gr1_read_t_bot_state;
-            elsif (regAddr = aspic_t_v_gr1_read_2_5_cmd) then
-              next_state <= aspic_t_v_gr1_read_2_5_state;
-            elsif (regAddr = aspic_t_v_gr1_read_5_cmd) then
-              next_state <= aspic_t_v_gr1_read_5_state;
-
-            elsif (regAddr = aspic_t_v_gr2_read_t_top_cmd) then
-              next_state <= aspic_t_v_gr2_read_t_top_state;
-            elsif (regAddr = aspic_t_v_gr2_read_t_bot_cmd) then
-              next_state <= aspic_t_v_gr2_read_t_bot_state;
-            elsif (regAddr = aspic_t_v_gr2_read_2_5_cmd) then
-              next_state <= aspic_t_v_gr2_read_2_5_state;
-            elsif (regAddr = aspic_t_v_gr2_read_5_cmd) then
-              next_state <= aspic_t_v_gr2_read_5_state;
+            elsif (regAddr = aspic_t_v_read_t_top_cmd) then
+              next_state <= aspic_t_v_read_t_top_state;
+            elsif (regAddr = aspic_t_v_read_t_bot_cmd) then
+              next_state <= aspic_t_v_read_t_bot_state;
+            elsif (regAddr = aspic_t_v_read_2_5_cmd) then
+              next_state <= aspic_t_v_read_2_5_state;
+            elsif (regAddr = aspic_t_v_read_5_cmd) then
+              next_state <= aspic_t_v_read_5_state;
 
             --------CCD temeprature read
             elsif (regAddr = ccd_temp_read_cmd) then
@@ -1295,7 +1288,7 @@ begin
                    ((regAddr >= func_time_set_base_1) and (regAddr <= func_time_set_high_1))) then
               next_state <= func_time_wr;
 
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_time_mem_w_en(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
@@ -1305,7 +1298,7 @@ begin
                    ((regAddr >= func_out_set_base_1) and (regAddr <= func_out_set_high_1))) then
               next_state <= func_output_wr;
 
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_out_mem_w_en(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
@@ -1314,77 +1307,77 @@ begin
                    ((regAddr >= prog_mem_base_1) and (regAddr <= prog_mem_high_1))) then
               next_state <= seq_prog_mem_wr;
 
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_prog_mem_w_en(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             -- sequencer step
             elsif (regAddr = seq_step_cmd_0 or regAddr = seq_step_cmd_1) then
               next_state <= seq_step_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_step(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             -- sequencer stop
             elsif (regAddr = func_stop_cmd_0 or regAddr = func_stop_cmd_1) then
               next_state <= seq_stop_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_stop(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             -- enable video ADC conv shift
             elsif (regAddr = enable_conv_shift_cmd_0 or regAddr = enable_conv_shift_cmd_1) then
               next_state <= enable_conv_shift_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_enable_conv_shift(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             -- initialize video ADC conv shift
             elsif (regAddr = init_conv_shift_cmd_0 or regAddr = init_conv_shift_cmd_1) then
               next_state <= init_conv_shift_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_init_conv_shift(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             -- indirect memory write
             elsif (regAddr = start_add_cmd_0 or regAddr = start_add_cmd_1) then
               next_state <= enable_start_add_prog_mem_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_start_add_prog_mem_en(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             elsif (((regAddr >= seq_ind_func_mem_base_0) and (regAddr <= seq_ind_func_mem_high_0)) or
                    ((regAddr >= seq_ind_func_mem_base_1) and (regAddr <= seq_ind_func_mem_high_1))) then
               next_state <= seq_ind_func_mem_we_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_ind_func_mem_we(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             elsif (((regAddr >= seq_ind_rep_mem_base_0) and (regAddr <= seq_ind_rep_mem_high_0)) or
                    ((regAddr >= seq_ind_rep_mem_base_1) and (regAddr <= seq_ind_rep_mem_high_1))) then
               next_state <= seq_ind_rep_mem_we_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_ind_rep_mem_we(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             elsif (((regAddr >= seq_ind_sub_add_mem_base_0) and (regAddr <= seq_ind_sub_add_mem_high_0)) or
                    ((regAddr >= seq_ind_sub_add_mem_base_1) and (regAddr <= seq_ind_sub_add_mem_high_1))) then
               next_state <= seq_ind_sub_add_mem_we_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_ind_sub_add_mem_we(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             elsif (((regAddr >= seq_ind_sub_rep_mem_base_0) and (regAddr <= seq_ind_sub_rep_mem_high_0)) or
                    ((regAddr >= seq_ind_sub_rep_mem_base_1) and (regAddr <= seq_ind_sub_rep_mem_high_1))) then
               next_state <= seq_ind_sub_rep_mem_we_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_ind_sub_rep_mem_we(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
             -- op code error reset
             elsif (regAddr = seq_op_code_error_reset_cmd_0 or regAddr = seq_op_code_error_reset_cmd_1) then
               next_state <= seq_op_code_error_reset_state;
-              if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+              if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
                 next_seq_op_code_error_reset(sequencer_index(regAddr(13 downto 12))) <= '1';
               end if;
 
@@ -1518,14 +1511,14 @@ begin
 
         next_state     <= wait_end_cmd;
         next_regAck    <= '1';
-        next_regDataRd <= ver.schema;
+        next_regDataRd <= REG_SCHEMA;
 
       -- HDL VERSION (add 1)
       when hdl_version =>
 
         next_state     <= wait_end_cmd;
         next_regAck    <= '1';
-        next_regDataRd <= ver.board_type & x"1" & LSST_SCI_VERSION(7 downto 0) & ver.vhdl_version;
+        next_regDataRd <= fwVersion;
 
       -- SCI ID (add 2)
       when SCI_ID =>
@@ -1539,7 +1532,7 @@ begin
 
         next_state     <= wait_end_cmd;
         next_regAck    <= '1';
-        next_regDataRd <= ver.reserved_1;
+        next_regDataRd <= cfg.reserved_1;
 
       -- TIME BASE READ lsw (add4)
       when time_base_read_lsw =>
@@ -1560,14 +1553,14 @@ begin
 
         next_state     <= wait_end_cmd;
         next_regAck    <= '1';
-        next_regDataRd <= ver.reserved_2;
+        next_regDataRd <= cfg.reserved_2;
 
       -- RESERVED 3 (add 7)
       when reserved_3 =>
 
         next_state     <= wait_end_cmd;
         next_regAck    <= '1';
-        next_regDataRd <= ver.reserved_3;
+        next_regDataRd <= cfg.reserved_3;
 
       -- STATE (add 8)
       when state_busy =>
@@ -1581,7 +1574,7 @@ begin
 
         next_state     <= wait_end_cmd;
         next_regAck    <= '1';
-        next_regDataRd <= std_logic_vector(to_unsigned(integer(CLK_PERIOD_G*1.0E12),32));
+        next_regDataRd <= std_logic_vector(to_unsigned(integer(cfg.sysClkPer*1.0E12),32));
 
       -- TRIGGER TIME READ SB lsw  (addA)
       when trigger_time_SB_lsw =>
@@ -1850,7 +1843,7 @@ begin
 
       -- sequencer time memory read
       when seq_func_time_rd =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd(15 downto 0) <= seq_time_mem_readbk(sequencer_index(regAddr(13 downto 12)));
         end if;
 
@@ -1860,7 +1853,7 @@ begin
 
       -- sequencer output memory read
       when seq_func_out_rd =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <= seq_out_mem_readbk(sequencer_index(regAddr(13 downto 12)));
         end if;
 
@@ -1869,7 +1862,7 @@ begin
 
       -- sequencer program memory read
       when seq_prog_mem_rd =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <= seq_prog_mem_readbk(sequencer_index(regAddr(13 downto 12)));
         end if;
 
@@ -1878,7 +1871,7 @@ begin
 
       -- enable video ADC conv shift read
       when enable_conv_shift_rd =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <= x"0000000" & "000" & enable_conv_shift_in(sequencer_index(regAddr(13 downto 12)));
         end if;
 
@@ -1887,7 +1880,7 @@ begin
 
       -- program memory init address read
       when start_add_prog_mem_rd_state =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <=  x"00000" & "00" & start_add_prog_mem_rbk(sequencer_index(regAddr(13 downto 12)));
         end if;
 
@@ -1896,7 +1889,7 @@ begin
 
       -- indirect functions mem read
       when seq_ind_func_mem_rdbk_state =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <=  x"0000000" & seq_ind_func_mem_rdbk(sequencer_index(regAddr(13 downto 12)));
         end if;
         next_state  <= wait_end_cmd;
@@ -1904,7 +1897,7 @@ begin
 
       -- indirect function repetitons mem read
       when seq_ind_rep_mem_rdbk_state =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <=  x"00" & seq_ind_rep_mem_rdbk(sequencer_index(regAddr(13 downto 12)));
         end if;
 
@@ -1913,7 +1906,7 @@ begin
 
       -- indirect subrutine address mem read
       when seq_ind_sub_add_mem_rdbk_state =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <=  x"00000" & "00" & seq_ind_sub_add_mem_rdbk(sequencer_index(regAddr(13 downto 12)));
         end if;
         next_state  <= wait_end_cmd;
@@ -1921,7 +1914,7 @@ begin
 
       -- indirect subrutine repetition mem read
       when seq_ind_sub_rep_mem_rdbk_state =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <=  x"0000" & seq_ind_sub_rep_mem_rdbk(sequencer_index(regAddr(13 downto 12)));
         end if;
         next_state  <= wait_end_cmd;
@@ -1929,7 +1922,7 @@ begin
 
       -- op code error flag read
       when seq_op_code_error_rd_state =>
-        if sequencer_index(regAddr(13 downto 12)) < NUM_SEQUENCERS_G then
+        if sequencer_index(regAddr(13 downto 12)) < cfg.numSequencers then
           next_regDataRd <= "000" & seq_op_code_error(sequencer_index(regAddr(13 downto 12))) & x"0000" & "00" & seq_op_code_error_add(sequencer_index(regAddr(13 downto 12)));
         end if;
         next_state  <= wait_end_cmd;
@@ -2241,52 +2234,28 @@ begin
           next_state <= ack_del_1;
         end if;
 
-      when aspic_t_v_gr1_read_t_top_state =>
+      when aspic_t_v_read_t_top_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(0);
+        next_regDataRd <= aspic_t_v_data(0);
         next_regAck    <= '1';
 
-      when aspic_t_v_gr1_read_t_bot_state =>
+      when aspic_t_v_read_t_bot_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(1);
+        next_regDataRd <= aspic_t_v_data(1);
         next_regAck    <= '1';
 
-      when aspic_t_v_gr1_read_2_5_state =>
+      when aspic_t_v_read_2_5_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(2);
+        next_regDataRd <= aspic_t_v_data(2);
         next_regAck    <= '1';
 
-      when aspic_t_v_gr1_read_5_state =>
+      when aspic_t_v_read_5_state =>
 
         next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(3);
-        next_regAck    <= '1';
-
-      when aspic_t_v_gr2_read_t_top_state =>
-
-        next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(4);
-        next_regAck    <= '1';
-
-      when aspic_t_v_gr2_read_t_bot_state =>
-
-        next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(5);
-        next_regAck    <= '1';
-
-      when aspic_t_v_gr2_read_2_5_state =>
-
-        next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(6);
-        next_regAck    <= '1';
-
-      when aspic_t_v_gr2_read_5_state =>
-
-        next_state     <= wait_end_cmd;
-        next_regDataRd <= x"0000" & aspic_t_v_data(7);
+        next_regDataRd <= aspic_t_v_data(3);
         next_regAck    <= '1';
 
       ---------------------- CCD Temperature sensor --------------------------

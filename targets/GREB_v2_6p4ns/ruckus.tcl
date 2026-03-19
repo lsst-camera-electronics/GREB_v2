@@ -8,5 +8,5 @@ loadRuckusTcl $::env(PROJ_DIR)/../../submodules/lsst_reb
 loadRuckusTcl $::env(PROJ_DIR)/../../common
 
 # Load local Source Code and constraints
-loadSource      -path "$::DIR_PATH/hdl/GREB_v2.vhd"
-loadConstraints -path $::env(PROJ_DIR)/../../common/greb_v2_base/rtl/GREB_v2_time.xdc
+loadSource      -path "$::DIR_PATH/hdl/GREB_v2_6p4ns.vhd"
+loadConstraints -path $::env(PROJ_DIR)/../../common/greb_v2_base/rtl/GREB_v2_natural_time.xdc

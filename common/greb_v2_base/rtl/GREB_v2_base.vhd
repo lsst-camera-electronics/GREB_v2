@@ -13,6 +13,7 @@ library lsst_sci;
 use lsst_sci.LsstSciPackage.all;
 
 library lsst_reb;
+use lsst_reb.reb_config_pkg.all;
 use lsst_reb.basic_elements_pkg.all;
 use lsst_reb.SequencerPkg.all;
 
@@ -23,7 +24,6 @@ use common.GREB_v2_pkg.all;
 entity GREB_v2_base is
   generic (
     BUILD_INFO_G : BuildInfoType;
-    VERSION_G    : RebVersionType;
     CONFIG_G     : RebConfigType
   );
   port (
@@ -178,7 +178,10 @@ end entity GREB_v2_base;
 architecture Behavioral of GREB_v2_base is
 
   -- Config
-  constant cfg : RebConfigType := CONFIG_G;
+  constant NUM_SENSORS_C   : integer := 2;
+  constant HAS_MULTIBOOT_C : boolean := True;
+  constant cfg             : RebConfigType := CONFIG_G;
+  constant fwVersion       : std_logic_vector(31 downto 0) := toBuildInfo(BUILD_INFO_G).fwVersion;
 
   -- Clocks
   signal pgpRefClk       : std_logic;
@@ -380,7 +383,7 @@ architecture Behavioral of GREB_v2_base is
   signal T4_reb_gr_error  : std_logic_vector(NUM_SENSORS_C-1 downto 0);
 
   -- ASPIC temp and voltage monitor
-  signal aspic_t_v_data    : Slv16Array(7 downto 0);
+  signal aspic_t_v_data    : Slv32Array(3 downto 0);
   signal aspic_t_v_start_r : std_logic;
   signal aspic_t_v_busy    : std_logic;
 
@@ -477,9 +480,7 @@ architecture Behavioral of GREB_v2_base is
 
 begin
 
-  assert (cfg.numSequencers = 1 or (cfg.numSequencers = NUM_SENSORS_C))
-    report "The number of sequencers must be 1 or equal to the number of sensors."
-    severity failure;
+  check_configuration(cfg, NUM_SENSORS_C, HAS_MULTIBOOT_C, fwVersion, LSST_SCI_VERSION);
 
   --------------------------------------------------------------------------
   -- Signal assignments
@@ -699,9 +700,11 @@ begin
   --------------------------------------------------------------------------
   cmd_interpreter_0 : entity common.GREB_v2_cmd_interpeter
     generic map(
-      VERSION_G => VERSION_G,
-      NUM_SEQUENCERS_G => cfg.numSequencers,
-      CLK_PERIOD_G     => cfg.sysClkPer
+      --VERSION_G => VERSION_G,
+      --NUM_SEQUENCERS_G => cfg.numSequencers,
+      --CLK_PERIOD_G     => cfg.sysClkPer
+      VERSION_G    => fwVersion,
+      CONFIG_G     => CONFIG_G
     )
     port map (
       reset => sys_rst,
@@ -1240,21 +1243,21 @@ begin
   end generate temp_rd_gr_generate;
 
   dual_ads1118_top_0 : entity lsst_reb.dual_ads1118_top
-  generic map (
-    CLK_PERIOD_G => cfg.sysClkPer
-  )
-  port map (
-    clk           => sys_clk,
-    reset         => sys_rst,
-    start_read    => aspic_t_v_start_r,
-    device_select => regDataWr_masked(0),
-    miso          => aspic_t_v_miso,
-    mosi          => aspic_t_v_mosi_int,
-    ss_adc        => aspic_t_v_ss_ccd_int,
-    sclk          => aspic_t_v_sclk_int,
-    link_busy     => aspic_t_v_busy,
-    data_from_adc => aspic_t_v_data
-  );
+    generic map (
+      CLK_PERIOD_G => cfg.sysClkPer
+    )
+    port map (
+      clk           => sys_clk,
+      reset         => sys_rst,
+      start_read    => aspic_t_v_start_r,
+      device_select => regDataWr_masked(0),
+      miso          => aspic_t_v_miso,
+      mosi          => aspic_t_v_mosi_int,
+      ss_adc        => aspic_t_v_ss_ccd_int,
+      sclk          => aspic_t_v_sclk_int,
+      link_busy     => aspic_t_v_busy,
+      data_from_adc => aspic_t_v_data
+    );
 
   ccd_temperature_sensor : entity lsst_reb.ad7794_top
     generic map (
@@ -1276,27 +1279,10 @@ begin
       data_out        => ccd_temp
     );
 
-  --ccd_temperature_sensor : entity lsst_reb.ad7794_top
-  --  port map (
-  --    clk             => sys_clk,
-  --    reset           => sys_rst,
-  --    start           => ccd_temp_start,
-  --    start_reset     => ccd_temp_start_reset,
-  --    read_write      => regDataWr_masked(19),
-  --    ad7794_dout_rdy => dout_24ADC,
-  --    reg_add         => regDataWr_masked(18 downto 16),
-  --    d_to_slave      => regDataWr_masked(15 downto 0),
-  --    ad7794_din      => din_24ADC,
-  --    ad7794_cs       => csb_24ADC,
-  --    ad7794_sclk     => sclk_24ADC,
-  --    busy            => ccd_temp_busy,
-  --    d_from_slave    => ccd_temp
-  --  );
-
   max_11046_multiple_top_1 : entity lsst_reb.max_11046_multiple_top
     generic map (
-      num_adc_on_bus => 2
-      --CLK_PERIOD_G   => cfg.sysClkPer,
+      num_adc_on_bus => 2,
+      CLK_PERIOD_G   => cfg.sysClkPer
     )
     port map (
       clk              => sys_clk,
@@ -1387,40 +1373,19 @@ begin
   ------------------------------------------------------------------------------
   -- Back Bias switch
   ------------------------------------------------------------------------------
-  process (sys_clk) is
-  begin
-    if rising_edge(sys_clk) then
-      if (first_reset_done = '0') then
-        first_reset <= sys_rst;
-        -- Detect the falling edge of the first reset
-        if (prev_sys_rst = '1' and sys_rst = '0') then
-          first_reset_done <= '1';
-        end if;
-        prev_sys_rst <= sys_rst;
-      else
-        first_reset <= '0';
-      end if;
-
-      if first_reset = '1' then
-        back_bias_sw_protected_int <= '0';
-        back_bias_sw_error_int <= '0';
-      elsif en_back_bias_sw = '1' then
-        back_bias_sw_protected_int <= regDataWr_masked(0) and not (or_reduce(bias_v_undr_th));
-        back_bias_sw_error_int <= regDataWr_masked(0) and (or_reduce(bias_v_undr_th));
-      end if;
-
-      back_bias_clamp_protected_int <= not back_bias_sw_protected_int;
-
-      if first_reset = '1' then
-        backbias_ssbe <= '0';
-        backbias_clamp <= '1';
-      else
-        backbias_ssbe <= back_bias_sw_protected_int;
-        backbias_clamp <= back_bias_clamp_protected_int;
-      end if;
-
-    end if;
-  end process;
+  U_backbias_switch : entity lsst_reb.backbias_switch
+    port map (
+      sys_clk            => sys_clk,
+      sys_rst            => sys_rst,
+      all_bias_v_undr_th => "000" & bias_v_undr_th,
+      sw_wr_en           => en_back_bias_sw,
+      sw_wr              => regDataWr_masked(0),
+      sw_error           => back_bias_sw_error_int,
+      sw_state           => back_bias_sw_protected_int,
+      cl_state           => back_bias_clamp_protected_int,
+      clamp              => backbias_clamp,
+      ssbe               => backbias_ssbe
+    );
 
   ------------------------------------------------------------------------------
   -- Remote Update
