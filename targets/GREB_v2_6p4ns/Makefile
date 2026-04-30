@@ -23,7 +23,7 @@
 # -------------------------------------------------------------------------------
 
 # Define Firmware Version Number (and don't forget to change the register values! :facepalm:)
-export PRJ_VERSION = 0x213B2012
+export PRJ_VERSION = 0x213B2013
 
 export GIT_BYPASS=0
 export OVERRIDE_SUBMODULE_LOCKS=0
