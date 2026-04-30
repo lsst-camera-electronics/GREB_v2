@@ -1281,7 +1281,7 @@ begin
 
   max_11046_multiple_top_1 : entity lsst_reb.max_11046_multiple_top
     generic map (
-      num_adc_on_bus => 2,
+      num_adc_on_bus => 3,
       CLK_PERIOD_G   => cfg.sysClkPer
     )
     port map (

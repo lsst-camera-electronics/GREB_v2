@@ -46,3 +46,4 @@ export PRJ_PART = XC7K160TFFG676-1
 
 # Use top level makefile
 include ../../submodules/ruckus/system_vivado.mk
+include ../check_logs.mk
