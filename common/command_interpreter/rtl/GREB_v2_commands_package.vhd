@@ -4,6 +4,9 @@ use IEEE.STD_LOGIC_1164.all;
 library surf;
 use surf.StdRtlPkg.all;
 
+library lsst_reb;
+use lsst_reb.SequencerPkg.all;
+
 package GREB_v2_commands_package is
 
   constant REG_SCHEMA      : std_logic_vector(31 downto 0) := x"00000001";
@@ -54,63 +57,58 @@ package GREB_v2_commands_package is
   constant ccd_sel_cmd            : std_logic_vector(23 downto 0) := x"400007";
   constant ccd_oe_cmd             : std_logic_vector(23 downto 0) := x"400008";
 
-  constant ccd_1_seq_override_cmd : std_logic_vector(23 downto 0) := x"410010";
-  constant ccd_2_seq_override_cmd : std_logic_vector(23 downto 0) := x"410011";
-
   -- Status Register
   constant read_status_reg_base : std_logic_vector(23 downto 0) := x"A00000";
   constant read_status_reg_high : std_logic_vector(23 downto 0) := x"A003ff";
 
-  -- Sequencer
-  -- sequencer 0
-  constant func_time_set_base_0    : std_logic_vector(23 downto 0) := x"200000";
-  constant func_time_set_high_0    : std_logic_vector(23 downto 0) := x"2000ff";
-  constant func_out_set_base_0     : std_logic_vector(23 downto 0) := x"100000";
-  constant func_out_set_high_0     : std_logic_vector(23 downto 0) := x"1000ff";
-  constant prog_mem_base_0         : std_logic_vector(23 downto 0) := x"300000";
-  constant prog_mem_high_0         : std_logic_vector(23 downto 0) := x"300fff";
-  constant seq_step_cmd_0          : std_logic_vector(23 downto 0) := x"310000";
-  constant func_stop_cmd_0         : std_logic_vector(23 downto 0) := x"320000";
-  constant enable_conv_shift_cmd_0 : std_logic_vector(23 downto 0) := x"330000";
-  constant init_conv_shift_cmd_0   : std_logic_vector(23 downto 0) := x"330001";
-  constant start_add_cmd_0         : std_logic_vector(23 downto 0) := x"340000";
+  ---------------------------------------------------------------------------
+  -- Sequencer Register Map
+  --
+  -- The Sequencer entity decodes addresses internally using the SeqRegMapType
+  -- record (defined in lsst_reb.SequencerPkg).  Each field specifies the
+  -- upper address byte addr[23:16] for a register block.  Instance selection
+  -- uses addr[13:12] (sequencer instance or sensor index for override).
+  -- The lower bits addr[9:0] provide the memory offset within each block.
+  --
+  -- Block          addr[23:16]  Index field     Offset field        Access
+  -- -----------    -----------  --------------  ------------------  ------
+  -- out_mem        x"10"        seq [13:12]     [7:0]  (0-255)     R/W
+  -- time_mem       x"20"        seq [13:12]     [7:0]  (0-255)     R/W
+  -- prog_mem       x"30"        seq [13:12]     [9:0]  (0-1023)    R/W
+  -- step_cmd       x"31"        seq [13:12]     —                  W
+  -- stop_cmd       x"32"        seq [13:12]     —                  W
+  -- conv_shift     x"33"        seq [13:12]     bit 0: 0=en, 1=init R/W
+  -- start_addr     x"34"        seq [13:12]     [4:0]              R/W
+  -- ind_func       x"35"        seq [13:12]     [3:0]  (0-15)      R/W
+  -- ind_rep        x"36"        seq [13:12]     [3:0]  (0-15)      R/W
+  -- ind_sub_add    x"37"        seq [13:12]     [3:0]  (0-15)      R/W
+  -- ind_sub_rep    x"38"        seq [13:12]     [3:0]  (0-15)      R/W
+  -- error_stat     x"39"        seq [13:12]     bit 0: 0=rd, 1=rst R/W
+  -- override       x"3A"        sensor [13:12]  —                  R/W
+  --
+  -- The cmd_interpreter routes any address with addr[23:16] in the range
+  -- SEQ_ADDR_LOW..SEQ_ADDR_HIGH to the Sequencer via the handshake interface.
+  ---------------------------------------------------------------------------
+  constant SEQ_REG_MAP_C : SeqRegMapType := (
+    out_mem     => x"10",
+    time_mem    => x"20",
+    prog_mem    => x"30",
+    step_cmd    => x"31",
+    stop_cmd    => x"32",
+    conv_shift  => x"33",
+    start_addr  => x"34",
+    ind_func    => x"35",
+    ind_rep     => x"36",
+    ind_sub_add => x"37",
+    ind_sub_rep => x"38",
+    error_stat  => x"39",
+    override    => x"3A"
+  );
 
-  constant seq_ind_func_mem_base_0    : std_logic_vector(23 downto 0) := x"350000";
-  constant seq_ind_func_mem_high_0    : std_logic_vector(23 downto 0) := x"35000f";
-  constant seq_ind_rep_mem_base_0     : std_logic_vector(23 downto 0) := x"360000";
-  constant seq_ind_rep_mem_high_0     : std_logic_vector(23 downto 0) := x"36000f";
-  constant seq_ind_sub_add_mem_base_0 : std_logic_vector(23 downto 0) := x"370000";
-  constant seq_ind_sub_add_mem_high_0 : std_logic_vector(23 downto 0) := x"37000f";
-  constant seq_ind_sub_rep_mem_base_0 : std_logic_vector(23 downto 0) := x"380000";
-  constant seq_ind_sub_rep_mem_high_0 : std_logic_vector(23 downto 0) := x"38000f";
-
-  constant seq_op_code_error_rd_cmd_0    : std_logic_vector(23 downto 0) := x"390000";
-  constant seq_op_code_error_reset_cmd_0 : std_logic_vector(23 downto 0) := x"390001";
-
-  -- sequencer 1
-  constant func_time_set_base_1    : std_logic_vector(23 downto 0) := x"201000";
-  constant func_time_set_high_1    : std_logic_vector(23 downto 0) := x"2010ff";
-  constant func_out_set_base_1     : std_logic_vector(23 downto 0) := x"101000";
-  constant func_out_set_high_1     : std_logic_vector(23 downto 0) := x"1010ff";
-  constant prog_mem_base_1         : std_logic_vector(23 downto 0) := x"301000";
-  constant prog_mem_high_1         : std_logic_vector(23 downto 0) := x"301fff";
-  constant seq_step_cmd_1          : std_logic_vector(23 downto 0) := x"311000";
-  constant func_stop_cmd_1         : std_logic_vector(23 downto 0) := x"321000";
-  constant enable_conv_shift_cmd_1 : std_logic_vector(23 downto 0) := x"331000";
-  constant init_conv_shift_cmd_1   : std_logic_vector(23 downto 0) := x"331001";
-  constant start_add_cmd_1         : std_logic_vector(23 downto 0) := x"341000";
-
-  constant seq_ind_func_mem_base_1    : std_logic_vector(23 downto 0) := x"351000";
-  constant seq_ind_func_mem_high_1    : std_logic_vector(23 downto 0) := x"35100f";
-  constant seq_ind_rep_mem_base_1     : std_logic_vector(23 downto 0) := x"361000";
-  constant seq_ind_rep_mem_high_1     : std_logic_vector(23 downto 0) := x"36100f";
-  constant seq_ind_sub_add_mem_base_1 : std_logic_vector(23 downto 0) := x"371000";
-  constant seq_ind_sub_add_mem_high_1 : std_logic_vector(23 downto 0) := x"37100f";
-  constant seq_ind_sub_rep_mem_base_1 : std_logic_vector(23 downto 0) := x"381000";
-  constant seq_ind_sub_rep_mem_high_1 : std_logic_vector(23 downto 0) := x"38100f";
-
-  constant seq_op_code_error_rd_cmd_1    : std_logic_vector(23 downto 0) := x"391000";
-  constant seq_op_code_error_reset_cmd_1 : std_logic_vector(23 downto 0) := x"391001";
+  -- Contiguous address range covering all sequencer registers.
+  -- Used by the cmd_interpreter to route requests to the Sequencer block.
+  constant SEQ_ADDR_LOW  : std_logic_vector(7 downto 0) := x"10";
+  constant SEQ_ADDR_HIGH : std_logic_vector(7 downto 0) := x"3A";
 
   -- ASPIC
   constant aspic_start_trans_cmd    : std_logic_vector(23 downto 0) := x"B00000";
