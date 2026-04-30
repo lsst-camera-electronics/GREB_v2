@@ -254,37 +254,16 @@ architecture Behavioral of GREB_v2_base is
   signal time_base_busy         : std_logic;
 
   -- sequencer signals
-  signal seq_start                : std_logic;
-  signal sequencer_busy           : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_time_mem_readbk      : Slv16Array(cfg.numSequencers-1 downto 0);
-  signal seq_out_mem_readbk       : Slv32Array(cfg.numSequencers-1 downto 0);
-  signal seq_prog_mem_readbk      : Slv32Array(cfg.numSequencers-1 downto 0);
-  signal seq_time_mem_w_en        : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_out_mem_w_en         : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_prog_mem_w_en        : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_step_cmd             : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_stop_cmd             : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal enable_conv_shift        : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal enable_conv_shift_out    : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal init_conv_shift          : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal end_sequence             : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal start_add_prog_mem_en    : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal start_add_prog_mem_rbk   : Slv10Array(cfg.numSequencers-1 downto 0);
-  signal seq_ind_func_mem_we      : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_ind_func_mem_rdbk    : Slv4Array(cfg.numSequencers-1 downto 0);
-  signal seq_ind_rep_mem_we       : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_ind_rep_mem_rdbk     : Slv24Array(cfg.numSequencers-1 downto 0);
-  signal seq_ind_sub_add_mem_we   : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_ind_sub_add_mem_rdbk : Slv10Array(cfg.numSequencers-1 downto 0);
-  signal seq_ind_sub_rep_mem_we   : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_ind_sub_rep_mem_rdbk : Slv16Array(cfg.numSequencers-1 downto 0);
-  signal seq_op_code_error        : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_op_code_error_reset  : std_logic_vector(cfg.numSequencers-1 downto 0);
-  signal seq_op_code_error_add    : Slv10Array(cfg.numSequencers-1 downto 0);
+  signal seq_start       : std_logic;
+  signal sequencer_busy  : std_logic_vector(cfg.numSequencers-1 downto 0);
+  signal end_sequence    : std_logic_vector(cfg.numSequencers-1 downto 0);
+  signal seq_reg_req     : std_logic;
+  signal seq_reg_op      : std_logic;
+  signal seq_reg_rd_data : std_logic_vector(31 downto 0);
+  signal seq_reg_ack     : std_logic;
+  signal seq_reg_fail    : std_logic;
 
   signal sequencer_outputs : SequencerOutputArray(NUM_SENSORS_C-1 downto 0);
-  signal seq_override_we   : std_logic_vector(NUM_SENSORS_C-1 downto 0);
-  signal seq_override_rd   : Slv32Array(NUM_SENSORS_C-1 downto 0);
 
   -- Image handler signals
   signal image_pattern_read : std_logic_vector(NUM_SENSORS_C-1 downto 0);
@@ -754,32 +733,11 @@ begin
       image_pattern_en   => image_pattern_en,
       ccd_sel_en         => open,
       -- Sequencer
-      seq_override_wr          => seq_override_we,
-      seq_override_rd          => seq_override_rd,
-      seq_time_mem_readbk      => seq_time_mem_readbk,
-      seq_out_mem_readbk       => seq_out_mem_readbk,
-      seq_prog_mem_readbk      => seq_prog_mem_readbk,
-      seq_time_mem_w_en        => seq_time_mem_w_en,
-      seq_out_mem_w_en         => seq_out_mem_w_en,
-      seq_prog_mem_w_en        => seq_prog_mem_w_en,
-      seq_step                 => seq_step_cmd,
-      seq_stop                 => seq_stop_cmd,
-      enable_conv_shift_in     => enable_conv_shift_out,
-      enable_conv_shift        => enable_conv_shift,
-      init_conv_shift          => init_conv_shift,
-      start_add_prog_mem_en    => start_add_prog_mem_en,
-      start_add_prog_mem_rbk   => start_add_prog_mem_rbk,
-      seq_ind_func_mem_we      => seq_ind_func_mem_we,
-      seq_ind_func_mem_rdbk    => seq_ind_func_mem_rdbk,
-      seq_ind_rep_mem_we       => seq_ind_rep_mem_we,
-      seq_ind_rep_mem_rdbk     => seq_ind_rep_mem_rdbk,
-      seq_ind_sub_add_mem_we   => seq_ind_sub_add_mem_we,
-      seq_ind_sub_add_mem_rdbk => seq_ind_sub_add_mem_rdbk,
-      seq_ind_sub_rep_mem_we   => seq_ind_sub_rep_mem_we,
-      seq_ind_sub_rep_mem_rdbk => seq_ind_sub_rep_mem_rdbk,
-      seq_op_code_error        => seq_op_code_error,
-      seq_op_code_error_add    => seq_op_code_error_add,
-      seq_op_code_error_reset  => seq_op_code_error_reset,
+      seq_reg_req     => seq_reg_req,
+      seq_reg_op      => seq_reg_op,
+      seq_reg_rd_data => seq_reg_rd_data,
+      seq_reg_ack     => seq_reg_ack,
+      seq_reg_fail    => seq_reg_fail,
       -- ASPIC
       aspic_config_r_ccd_1 => aspic_config_r_ccd(0),
       aspic_config_r_ccd_2 => aspic_config_r_ccd(1),
@@ -1003,46 +961,28 @@ begin
   Sequencers : entity lsst_reb.Sequencer
     generic map (
       NUM_SENSORS_G    => NUM_SENSORS_C,
-      NUM_SEQUENCERS_G => cfg.numSequencers
+      NUM_SEQUENCERS_G => cfg.numSequencers,
+      REG_MAP_G        => SEQ_REG_MAP_C
     )
     port map (
       clk => sys_clk,
       rst => sys_rst,
-      regAddr => regAddr,
-      regDataWr => regDataWr_masked,
-      sync_cmd_start => sync_cmd_start_seq,
-      sync_cmd_stop => sync_cmd_stop_seq,
-      sync_cmd_step => sync_cmd_step_seq,
-      reg_cmd_start => start_add_prog_mem_en,
-      reg_cmd_stop  => seq_stop_cmd,
-      reg_cmd_step  => seq_step_cmd,
+      reg_req     => seq_reg_req,
+      reg_op      => seq_reg_op,
+      reg_addr    => regAddr,
+      reg_wr_data => regDataWr_masked,
+      reg_rd_data => seq_reg_rd_data,
+      reg_ack     => seq_reg_ack,
+      reg_fail    => seq_reg_fail,
+      sync_cmd_start     => sync_cmd_start_seq,
+      sync_cmd_stop      => sync_cmd_stop_seq,
+      sync_cmd_step      => sync_cmd_step_seq,
       sync_cmd_main_addr => sync_cmd_main_add,
-      sequencer_start_addr_rd => start_add_prog_mem_rbk,
-      prog_mem_we => seq_prog_mem_w_en,
-      prog_mem_rd => seq_prog_mem_readbk,
-      ind_func_mem_we => seq_ind_func_mem_we,
-      ind_func_mem_rd => seq_ind_func_mem_rdbk,
-      ind_rep_mem_we => seq_ind_rep_mem_we,
-      ind_rep_mem_rd => seq_ind_rep_mem_rdbk,
-      ind_sub_add_mem_we => seq_ind_sub_add_mem_we,
-      ind_sub_add_mem_rd => seq_ind_sub_add_mem_rdbk,
-      ind_sub_rep_mem_we => seq_ind_sub_rep_mem_we,
-      ind_sub_rep_mem_rd => seq_ind_sub_rep_mem_rdbk,
-      time_mem_we => seq_time_mem_w_en,
-      time_mem_rd => seq_time_mem_readbk,
-      out_mem_we => seq_out_mem_w_en,
-      out_mem_rd => seq_out_mem_readbk,
-      op_code_error_reset => seq_op_code_error_reset,
-      op_code_error => seq_op_code_error,
-      op_code_error_add => seq_op_code_error_add,
-      override_we => seq_override_we,
-      override_rd => seq_override_rd,
       sequencer_busy => sequencer_busy,
-      end_sequence => end_sequence,
-      sequencer_out => sequencer_outputs,
-      enable_conv_shift => enable_conv_shift,
-      init_conv_shift => init_conv_shift,
-      enable_conv_shift_out => enable_conv_shift_out
+      end_sequence   => end_sequence,
+      sequencer_out  => sequencer_outputs,
+      op_code_error     => open,
+      op_code_error_add => open
     );
 
   --------------------------------------------------------------------------
