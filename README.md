@@ -15,6 +15,34 @@ and Vivado. The GREB drives two guider sensors.
 
 All targets use the same RTL and produce identical register-level behaviour.
 
+## Target configuration
+
+All targets instantiate the same `GREB_v2_base` entity, parameterised by a
+`RebConfigType` record (defined in
+`submodules/lsst_reb/reb_config/rtl/reb_config_pkg.vhd`).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `numSequencers` | 1 or 2 | Number of sequencer instances |
+| `sysClkPer` | real | System clock period (seconds) |
+| `gdAddr` | 4-bit | Guard drain DAC channel address |
+| `odAddr` | 4-bit | Output drain DAC channel address |
+| `rdAddr` | 4-bit | Reset drain DAC channel address |
+| `gdThresh` | integer×3 | Guard drain threshold per sensor |
+| `odThresh` | integer×3 | Output drain threshold per sensor |
+| `rdThresh` | integer×3 | Reset drain threshold per sensor |
+| `reserved_1` | 32-bit | DAQ index for location-limited targets |
+| `reserved_2` | 32-bit | Reserved |
+| `reserved_3` | 32-bit | Reserved |
+
+With `numSequencers=1`, a single sequencer drives both sensors.
+With `numSequencers=2`, each sensor has an independent sequencer instance.
+
+All GREB targets use the same configuration values: `gdAddr=0x0`,
+`odAddr=0x5`, `rdAddr=0x1`, `gdThresh=(1138,1138,0)`,
+`odThresh=(2275,2275,0)`, `rdThresh=(1632,1632,0)`. The third element is
+zero because the GREB has only two active sensors.
+
 ## Repository layout
 
 | Path | Contents |
